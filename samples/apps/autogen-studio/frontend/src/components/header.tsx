@@ -1,3 +1,4 @@
+import Logo from "./logo";
 import Icon from "./icons";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
@@ -67,22 +68,11 @@ const Header = ({ meta, link }: any) => {
         <>
           <div className="  px-0 sm:px-0 lg:px-0 ">
             <div className="flex justify-between h-16">
-              <div className="flex  lg:px-0 ">
-                <div className="flex flex-shrink-0 pt-2">
-                  <a className="block  " href="/#">
-                    <span className=" bg-primary  inline-block pt-2 absolute">
-                      {" "}
-                      <div className="inline-block w-10  text-accent   bg-primary pb-2 mr-1">
-                        <Icon icon="app" size={8} />
-                      </div>{" "}
-                    </span>
-                    <div className="pt-1 text-lg ml-14     inline-block">
-                      <div className=" flex flex-col">
-                        <div className="text-base">{meta.title}</div>
-                        <div className="text-xs"> {meta.description}</div>
-                      </div>
-                    </div>
-                  </a>
+              <div className="flex lg:px-0">
+                <div className="flex flex-shrink-0 justify-center items-center">
+                  <div className="inline-block text-slate-800 bg-primary mr-1 pt-2">
+                    <Logo className="w-20"/>
+                  </div>
                 </div>
 
                 <div className="hidden md:ml-6 md:flex md:space-x-6">
@@ -128,26 +118,40 @@ const Header = ({ meta, link }: any) => {
               </div>
               {
                 <div className="hidden lg:ml-4 md:flex md:items-center">
-                  <DarkModeToggle />
+                  {/*<DarkModeToggle />*/}
 
                   {user && (
-                    <>
-                      <div className="ml-3">
-                        <div className="text-sm text-primary">{userName}</div>
-                        <div className="text-xs  text-secondary">{user_id}</div>
-                      </div>
+                      <>
+                        <div className="ml-3 flex items-center space-x-2">
 
-                      {/* Profile dropdown */}
-                      <Menu as="div" className="ml-4 relative flex-shrink-0">
-                        <div>
-                          <Menu.Button className="bg-primary rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
-                            <span className="sr-only">Open user menu</span>
-                            {userAvatarUrl && (
-                              <img
-                                className="h-8 w-8 rounded-full"
-                                src={userAvatarUrl}
-                                alt=""
-                              />
+                            <Icon icon="wallet" size={6}/>
+                            <span className="text-sm text-primary"
+                                  title={`Subscription credits: ${(
+                                      Number(user?.subscription_credits) || 0
+                                  ).toFixed(2)} + Extra credits: ${(
+                                      Number(user?.extra_credits) || 0
+                                  ).toFixed(2)}`}
+                            >
+                        {(
+                            (Number(user?.subscription_credits) || 0) +
+                            (Number(user?.extra_credits) || 0)
+                        ).toFixed(2)}
+                      </span>
+
+                        </div>
+
+                        {/* Profile dropdown */}
+                        <Menu as="div" className="ml-4 relative flex-shrink-0">
+                          <div>
+                            <Menu.Button
+                                className="bg-primary rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                              <span className="sr-only">Open user menu</span>
+                              {userAvatarUrl && (
+                                  <img
+                                      className="h-8 w-8 rounded-full"
+                                      src={userAvatarUrl}
+                                      alt=""
+                                  />
                             )}
                             {!userAvatarUrl && userName && (
                               <div className="border-2 bg-accent pt-1 h-8 w-8 align-middle text-sm text-white rounded-full">
@@ -166,16 +170,16 @@ const Header = ({ meta, link }: any) => {
                           leaveTo="transform opacity-0 scale-95"
                         >
                           <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-primary ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {/* <Menu.Item>
+                            <Menu.Item>
                         {({ active }) => (
                           <a
-                            href="#"
+                            href={`https://takin.ai/user/${user.id}`}
                             className={classNames(active ? 'bg-secondary' : '', 'block px-4 py-2 text-sm text-primary')}
                           >
-                            Your Profile
+                          Settings
                           </a>
                         )}
-                      </Menu.Item> */}
+                      </Menu.Item>
 
                             <Menu.Item>
                               {({ active }) => (

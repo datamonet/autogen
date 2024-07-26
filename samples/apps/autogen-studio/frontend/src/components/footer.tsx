@@ -19,7 +19,8 @@ const Footer = () => {
   return (
     <div className=" mt-4 text-primary p-3  border-t border-secondary flex ">
       <div className="text-xs flex-1">
-        Maintained by the AutoGen{" "}
+        Powered by
+        {" "}
         <a
           target={"_blank"}
           rel={"noopener noreferrer"}
@@ -27,7 +28,7 @@ const Footer = () => {
           href="https://microsoft.github.io/autogen/"
         >
           {" "}
-          Team.
+          AutoGen.
         </a>
       </div>
       {version && (
