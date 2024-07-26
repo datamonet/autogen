@@ -233,6 +233,7 @@ def get_app_root() -> str:
 
     :return: The root directory of the application.
     """
+    # TODO: takin command：先后顺序的逻辑修改，如果有AUTOGENSTUDIO_APPDIR 还需要创建default_app_root？
     app_name = f".{APP_NAME}"
     default_app_root = os.path.join(os.path.expanduser("~"), app_name)
     if not os.path.exists(default_app_root):

@@ -1,10 +1,12 @@
 import asyncio
 import os
+import jwt
 import queue
 import threading
 import traceback
 from contextlib import asynccontextmanager
 from typing import Any
+from bson.objectid import ObjectId
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +19,7 @@ from ..database import workflow_from_id
 from ..database.dbmanager import DBManager
 from ..datamodel import Agent, Message, Model, Response, Session, Skill, Workflow
 from ..utils import check_and_cast_datetime_fields, init_app_folders, md5_hash, test_model
+from ..database.mongo_client import db
 from ..version import VERSION
 
 managers = {"chat": None}  # manage calls to autogen
@@ -57,6 +60,7 @@ message_handler_thread.start()
 
 app_file_path = os.path.dirname(os.path.abspath(__file__))
 folders = init_app_folders(app_file_path)
+print('folders', folders)
 ui_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui")
 
 database_engine_uri = folders["database_engine_uri"]
@@ -138,6 +142,21 @@ def delete_entity(model_class: Any, filters: dict = None):
 
     return dbmanager.delete(filters=filters, model_class=model_class)
 
+
+@api.get("/login")
+async def get_user(token: str):
+    """get user info from mongodb"""
+    payload = jwt.decode(token, options={"verify_signature": False})
+    user = db['users'].find_one({'email': payload.get('email')})
+    if user:
+        user['id'] = str(user.pop('_id'))
+    return user
+
+@api.post("/update/{user_id}")
+async def get_user(user_id: str,payload:dict):
+    """update user info from mongodb"""
+    res = db['users'].update_one({'_id':ObjectId(user_id)},{'$set':payload})
+    return res
 
 @api.get("/skills")
 async def list_skills(user_id: str):

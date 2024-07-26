@@ -134,6 +134,7 @@ def run_migration(engine_uri: str):
         # raise RuntimeError(f"Error running migrations: {exc}")
 
 
+# takin command： 初始化数据库
 def init_db_samples(dbmanager: Any):
     workflows = dbmanager.get(Workflow).data
     workflow_names = [w.name for w in workflows]

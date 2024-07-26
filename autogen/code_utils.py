@@ -505,7 +505,7 @@ def execute_code(
         container.reload()
     if container.status != "exited":
         container.stop()
-        container.remove()
+        container.remove() # takin command：删除容器
         if original_filename is None:
             os.remove(filepath)
         return 1, TIMEOUT_MSG, image

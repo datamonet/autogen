@@ -19,8 +19,8 @@ function classNames(...classes: string[]) {
 const Header = ({ meta, link }: any) => {
   const { user, logout } = React.useContext(appContext);
   const userName = user ? user.name : "Unknown";
-  const userAvatarUrl = user ? user.avatar_url : "";
-  const user_id = user ? user.username : "unknown";
+  const userAvatarUrl = user ? user.avatar : ""; // takin command:修改用户展示
+  const user_id = user ? user.name : "unknown";
 
   const links: any[] = [
     { name: "Build", href: "/build" },

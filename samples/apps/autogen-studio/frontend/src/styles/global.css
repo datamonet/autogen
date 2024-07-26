@@ -242,6 +242,10 @@ iiz__zoom-img {
   @apply bg-primary rounded !important;
 }
 
+.ant-tabs-nav-operations {
+  display: none !important;
+}
+
 .ant-upload-list,
 .ant-upload-hint,
 .ant-upload-list-text,

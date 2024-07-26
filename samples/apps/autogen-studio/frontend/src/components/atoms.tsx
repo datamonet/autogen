@@ -592,9 +592,10 @@ export const BounceLoader = ({
   return (
     <div className="inline-block">
       <div className="inline-flex gap-2">
-        <span className="  rounded-full bg-accent h-2 w-2  inline-block"></span>
-        <span className="animate-bounce rounded-full bg-accent h-3 w-3  inline-block"></span>
-        <span className=" rounded-full bg-accent h-2 w-2  inline-block"></span>
+   {/*takin command:允许传递className样式以便于修改颜色*/}
+        <span className={`rounded-full h-2 w-2 inline-block ${className||'bg-accent'}`}></span>
+        <span className={`animate-bounce rounded-full h-3 w-3 inline-block ${className||'bg-accent'}`}></span>
+        <span className={`rounded-full h-2 w-2 inline-block ${className||'bg-accent'}`}></span>
       </div>
       <span className="  text-sm">{title}</span>
     </div>
