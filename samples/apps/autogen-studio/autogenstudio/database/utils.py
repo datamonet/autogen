@@ -144,12 +144,12 @@ def init_db_samples(dbmanager: Any):
     logger.info("Initializing database with Default and Travel Planning Workflows")
     # models
     gpt_4_model = Model(
-        model="gpt-4-1106-preview", description="OpenAI GPT-4 model", user_id="guestuser@gmail.com", api_type="open_ai"
+        model="gpt-4-1106-preview", description="OpenAI GPT-4 model", user_id="faye_1225@163.com", api_type="open_ai"
     )
     azure_model = Model(
         model="gpt4-turbo",
         description="Azure OpenAI  model",
-        user_id="guestuser@gmail.com",
+        user_id="faye_1225@163.com",
         api_type="azure",
         base_url="https://api.your azureendpoint.com/v1",
     )
@@ -157,14 +157,14 @@ def init_db_samples(dbmanager: Any):
         model="zephyr",
         description="Local Huggingface Zephyr model via vLLM, LMStudio or Ollama",
         base_url="http://localhost:1234/v1",
-        user_id="guestuser@gmail.com",
+        user_id="faye_1225@163.com",
         api_type="open_ai",
     )
 
     google_gemini_model = Model(
         model="gemini-1.5-pro-latest",
         description="Google's Gemini model",
-        user_id="guestuser@gmail.com",
+        user_id="faye_1225@163.com",
         api_type="google",
     )
 
@@ -174,7 +174,7 @@ def init_db_samples(dbmanager: Any):
         name="generate_images",
         description="Generate and save images based on a user's query.",
         content='\nfrom typing import List\nimport uuid\nimport requests  # to perform HTTP requests\nfrom pathlib import Path\n\nfrom openai import OpenAI\n\n\ndef generate_and_save_images(query: str, image_size: str = "1024x1024") -> List[str]:\n    """\n    Function to paint, draw or illustrate images based on the users query or request. Generates images from a given query using OpenAI\'s DALL-E model and saves them to disk.  Use the code below anytime there is a request to create an image.\n\n    :param query: A natural language description of the image to be generated.\n    :param image_size: The size of the image to be generated. (default is "1024x1024")\n    :return: A list of filenames for the saved images.\n    """\n\n    client = OpenAI()  # Initialize the OpenAI client\n    response = client.images.generate(model="dall-e-3", prompt=query, n=1, size=image_size)  # Generate images\n\n    # List to store the file names of saved images\n    saved_files = []\n\n    # Check if the response is successful\n    if response.data:\n        for image_data in response.data:\n            # Generate a random UUID as the file name\n            file_name = str(uuid.uuid4()) + ".png"  # Assuming the image is a PNG\n            file_path = Path(file_name)\n\n            img_url = image_data.url\n            img_response = requests.get(img_url)\n            if img_response.status_code == 200:\n                # Write the binary content to a file\n                with open(file_path, "wb") as img_file:\n                    img_file.write(img_response.content)\n                    print(f"Image saved to {file_path}")\n                    saved_files.append(str(file_path))\n            else:\n                print(f"Failed to download the image from {img_url}")\n    else:\n        print("No image data found in the response!")\n\n    # Return the list of saved files\n    return saved_files\n\n\n# Example usage of the function:\n# generate_and_save_images("A cute baby sea otter")\n',
-        user_id="guestuser@gmail.com",
+        user_id="faye_1225@163.com",
     )
 
     # agents
@@ -189,7 +189,7 @@ def init_db_samples(dbmanager: Any):
         llm_config=False,
     )
     user_proxy = Agent(
-        user_id="guestuser@gmail.com", type=AgentType.userproxy, config=user_proxy_config.model_dump(mode="json")
+        user_id="faye_1225@163.com", type=AgentType.userproxy, config=user_proxy_config.model_dump(mode="json")
     )
 
     painter_assistant_config = AgentConfig(
@@ -202,7 +202,7 @@ def init_db_samples(dbmanager: Any):
         llm_config={},
     )
     painter_assistant = Agent(
-        user_id="guestuser@gmail.com", type=AgentType.assistant, config=painter_assistant_config.model_dump(mode="json")
+        user_id="faye_1225@163.com", type=AgentType.assistant, config=painter_assistant_config.model_dump(mode="json")
     )
 
     planner_assistant_config = AgentConfig(
@@ -215,7 +215,7 @@ def init_db_samples(dbmanager: Any):
         llm_config={},
     )
     planner_assistant = Agent(
-        user_id="guestuser@gmail.com", type=AgentType.assistant, config=planner_assistant_config.model_dump(mode="json")
+        user_id="faye_1225@163.com", type=AgentType.assistant, config=planner_assistant_config.model_dump(mode="json")
     )
 
     local_assistant_config = AgentConfig(
@@ -228,7 +228,7 @@ def init_db_samples(dbmanager: Any):
         llm_config={},
     )
     local_assistant = Agent(
-        user_id="guestuser@gmail.com", type=AgentType.assistant, config=local_assistant_config.model_dump(mode="json")
+        user_id="faye_1225@163.com", type=AgentType.assistant, config=local_assistant_config.model_dump(mode="json")
     )
 
     language_assistant_config = AgentConfig(
@@ -241,7 +241,7 @@ def init_db_samples(dbmanager: Any):
         llm_config={},
     )
     language_assistant = Agent(
-        user_id="guestuser@gmail.com",
+        user_id="faye_1225@163.com",
         type=AgentType.assistant,
         config=language_assistant_config.model_dump(mode="json"),
     )
@@ -260,14 +260,14 @@ def init_db_samples(dbmanager: Any):
         speaker_selection_method="auto",
     )
     travel_groupchat_agent = Agent(
-        user_id="guestuser@gmail.com", type=AgentType.groupchat, config=travel_groupchat_config.model_dump(mode="json")
+        user_id="faye_1225@163.com", type=AgentType.groupchat, config=travel_groupchat_config.model_dump(mode="json")
     )
 
     # workflows
-    default_workflow = Workflow(name="Default Workflow", description="Default workflow", user_id="guestuser@gmail.com")
+    default_workflow = Workflow(name="Default Workflow", description="Default workflow", user_id="faye_1225@163.com")
 
     travel_workflow = Workflow(
-        name="Travel Planning Workflow", description="Travel workflow", user_id="guestuser@gmail.com"
+        name="Travel Planning Workflow", description="Travel workflow", user_id="faye_1225@163.com"
     )
 
     with Session(dbmanager.engine) as session:

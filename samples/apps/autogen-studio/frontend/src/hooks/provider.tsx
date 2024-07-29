@@ -42,7 +42,7 @@ const Provider = ({children}: any) => {
         storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
     );
     const [user, setUser] = useState<IUser | null>(null);
-    const token =  getCookie(cookie_name)
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZheWVfMTIyNUAxNjMuY29tIiwiZXhwIjoxNzI0ODI2NzgwLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.Dble_hdNJojtfxDlE9WBnAwk3BGBNvCf8GN5BueslD4'
 
     const fetchUser = () => {
         const payLoad = {
