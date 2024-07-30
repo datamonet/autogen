@@ -252,7 +252,8 @@ async def delete_skill(skill_id: int, user_id: str):
 @api.get("/models")
 async def list_models(user_id: str):
     """List all models for a user"""
-    filters = {"user_id": user_id}
+    # takin command:固定model，不做筛选
+    filters = {}
     return list_entity(Model, filters=filters)
 
 
