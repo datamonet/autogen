@@ -4,9 +4,8 @@ import {
     fetchJSON,
     getCookie,
     getLocalStorage, eraseCookie,
-    setLocalStorage,
+    setLocalStorage, getServerUrl,
 } from "../components/utils";
-import {message} from "antd";
 import {BounceLoader} from "../components/atoms";
 
 export interface IUser {
@@ -29,7 +28,7 @@ export interface AppContextType {
     setDarkMode: any;
 }
 
-
+// TODO:修改callback
 const signUrl = 'https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fdify.takin.ai%2Fapps';
 const cookie_name = "__Secure-next-auth.session-token";
 
@@ -37,12 +36,14 @@ export const appContext = React.createContext<AppContextType>(
     {} as AppContextType
 );
 const Provider = ({children}: any) => {
+    const serverUrl = getServerUrl();
     const storedValue = getLocalStorage("darkmode", false);
     const [darkMode, setDarkMode] = useState(
         storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
     );
     const [user, setUser] = useState<IUser | null>(null);
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZheWVfMTIyNUAxNjMuY29tIiwiZXhwIjoxNzI0ODI2NzgwLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.Dble_hdNJojtfxDlE9WBnAwk3BGBNvCf8GN5BueslD4'
+    const token = getCookie(cookie_name);
+    // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZheWVfMTIyNUAxNjMuY29tIiwiZXhwIjoxNzI0ODI2NzgwLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.Dble_hdNJojtfxDlE9WBnAwk3BGBNvCf8GN5BueslD4'
 
     const fetchUser = () => {
         const payLoad = {
@@ -58,7 +59,7 @@ const Provider = ({children}: any) => {
         const onError = (err: any) => {
             navigate(signUrl)
         };
-        fetchJSON(`api/login?token=${token}`, payLoad, onSuccess, onError);
+        fetchJSON(`${serverUrl}/login?token=${token}`, payLoad, onSuccess, onError);
     };
 
 
