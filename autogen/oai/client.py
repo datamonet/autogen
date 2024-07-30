@@ -343,16 +343,6 @@ class OpenAIClient:
 
     @staticmethod
     def get_usage(response: Union[ChatCompletion, Completion]) -> Dict:
-        print(
-            '~~get_usage~~' * 100,
-            {
-                "prompt_tokens": response.usage.prompt_tokens if response.usage is not None else 0,
-                "completion_tokens": response.usage.completion_tokens if response.usage is not None else 0,
-                "total_tokens": response.usage.total_tokens if response.usage is not None else 0,
-                "cost": response.cost if hasattr(response, "cost") else 0,
-                "model": response.model,
-            }
-        )
         return {
             "prompt_tokens": response.usage.prompt_tokens if response.usage is not None else 0,
             "completion_tokens": response.usage.completion_tokens if response.usage is not None else 0,

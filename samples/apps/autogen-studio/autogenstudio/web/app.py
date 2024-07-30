@@ -1,5 +1,8 @@
 import asyncio
+import json
 import os
+import time
+from pydantic import BaseModel
 import jwt
 import queue
 import threading
@@ -59,7 +62,6 @@ def message_handler():
 message_handler_thread = threading.Thread(target=message_handler, daemon=True)
 message_handler_thread.start()
 
-
 app_file_path = os.path.dirname(os.path.abspath(__file__))
 folders = init_app_folders(app_file_path)
 ui_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui")
@@ -81,7 +83,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
 
 # allow cross origin requests for testing on localhost:800* ports only
 app.add_middleware(
@@ -136,10 +137,10 @@ def create_entity(model: Any, model_class: Any, filters: dict = None):
 
 
 def list_entity(
-    model_class: Any,
-    filters: dict = None,
-    return_json: bool = True,
-    order: str = "desc",
+        model_class: Any,
+        filters: dict = None,
+        return_json: bool = True,
+        order: str = "desc",
 ):
     """List all entities for a user"""
     return dbmanager.get(model_class, filters=filters, return_json=return_json, order=order)
@@ -155,16 +156,77 @@ def delete_entity(model_class: Any, filters: dict = None):
 async def get_user(token: str):
     """get user info from mongodb"""
     payload = jwt.decode(token, options={"verify_signature": False})
-    user = db['users'].find_one({'email': payload.get('email')})
+    user = db["users"].find_one({"email": payload.get("email")})
     if user:
-        user['id'] = str(user.pop('_id'))
+        user["id"] = str(user.pop("_id"))
     return user
 
-@api.post("/update/{user_id}")
-async def get_user(user_id: str,payload:dict):
-    """update user info from mongodb"""
-    res = db['users'].update_one({'_id':ObjectId(user_id)},{'$set':payload})
-    return res
+
+class UpdatePayload(BaseModel):
+    user_id: str
+    message_id: int
+
+
+@api.post("/update")
+async def update_user(item: UpdatePayload):
+    """Update user info from MongoDB"""
+    try:
+        # 获取用户文档
+        user_doc = db["users"].find_one({"_id": ObjectId(item.user_id)})
+
+        subscription_credits = user_doc.get('subscription_credits', 0)
+        extra_credits = user_doc.get('extra_credits', 0)
+
+        # 获取消息和用户配置文件
+        agent_message = dbmanager.get(Message, filters={"id": item.message_id}).data[0]
+        profile = profiler.profile(agent_message)
+
+        # 检查是否已经扣费
+        if db["bill"].find_one({"userId": item.user_id, "type": "AutoGen Studio", "source": item.message_id}):
+            return {"extra_credits": extra_credits, "subscription_credits": subscription_credits}
+
+        # 计算总费用
+        total_usd = sum(item.get("total_cost", 0) for item in profile.get("usage", []))
+        cost = total_usd * 100 * 1.25
+
+        # 保证最低消费为0.01
+        total_cost = max(round(cost, 2), 0.01)
+
+        # 扣费逻辑
+        if extra_credits >= total_cost:
+            extra_credits -= total_cost
+        else:
+            total_cost -= extra_credits
+            extra_credits = 0
+            subscription_credits = max(subscription_credits - total_cost, 0)
+
+        # 插入账单记录
+        db["bill"].insert_one({
+            "userId": item.user_id,
+            "type": "AutoGen Studio",
+            "source": item.message_id,
+            "cost": cost,
+            "extra": profile.get("usage", []),
+            "createdAt": int(time.time() * 1000)
+        })
+
+        # 更新用户积分
+        db["users"].update_one(
+            {"_id": ObjectId(item.user_id)},
+            {"$set": {
+                "extra_credits": extra_credits,
+                "subscription_credits": subscription_credits
+            }}
+        )
+
+        return {"extra_credits": extra_credits, "subscription_credits": subscription_credits}
+
+    except (OpenAIError, Exception) as ex_error:
+        return {
+            "status": False,
+            "message": str(ex_error),
+        }
+
 
 @api.get("/skills")
 async def list_skills(user_id: str):
