@@ -16,9 +16,9 @@ require("dotenv").config({
 const config: GatsbyConfig = {
   pathPrefix: `${process.env.PREFIX_PATH_VALUE}`,
   siteMetadata: {
-    title: `AutoGen Studio [Beta]`,
+    title: `Takin - AutoGen Studio`,
     description: `Build Multi-Agent Apps`,
-    siteUrl: `http://tbd.place`,
+    siteUrl: `https://takin.ai`,
   },
   flags: {
     LAZY_IMAGES: true,
@@ -33,7 +33,7 @@ const config: GatsbyConfig = {
     {
       resolve: "gatsby-plugin-manifest",
       options: {
-        icon: "src/images/icon.png",
+        icon: "src/images/favicon.ico",
       },
     },
     "gatsby-plugin-mdx",
