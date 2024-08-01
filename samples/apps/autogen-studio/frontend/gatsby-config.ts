@@ -32,9 +32,9 @@ const config: GatsbyConfig = {
     "gatsby-plugin-postcss",
     {
       resolve: "gatsby-plugin-manifest",
-      options: {
-        icon: "src/images/icon.png",
-      },
+      // options: {
+      //   icon: "src/images/icon.png",
+      // },
     },
     "gatsby-plugin-mdx",
     "gatsby-plugin-sharp",
