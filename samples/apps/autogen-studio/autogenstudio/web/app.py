@@ -155,6 +155,7 @@ def delete_entity(model_class: Any, filters: dict = None):
 @api.get("/login")
 async def get_user(token: str):
     """get user info from mongodb"""
+    print('web site',token)
     payload = jwt.decode(token, options={"verify_signature": False})
     user = db["users"].find_one({"email": payload.get("email")})
     if user:
