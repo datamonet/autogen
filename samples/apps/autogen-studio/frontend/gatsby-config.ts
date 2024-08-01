@@ -30,12 +30,12 @@ const config: GatsbyConfig = {
     "gatsby-plugin-image",
     "gatsby-plugin-sitemap",
     "gatsby-plugin-postcss",
-    {
-      resolve: "gatsby-plugin-manifest",
-      options: {
-        icon: "src/images/icon.png",
-      },
-    },
+    // {
+    //   resolve: "gatsby-plugin-manifest",
+    //   options: {
+    //     icon: "src/images/icon.png",
+    //   },
+    // },
     "gatsby-plugin-mdx",
     "gatsby-plugin-sharp",
     "gatsby-transformer-sharp",
