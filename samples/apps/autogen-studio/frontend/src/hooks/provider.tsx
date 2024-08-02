@@ -29,8 +29,7 @@ export interface AppContextType {
 }
 
 // TODO:修改callback
-const signUrl = 'https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fdify.takin.ai%2Fapps';
-const cookie_name = "__Secure-next-auth.session-token";
+const signUrl = 'https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fautogen.takin.ai';
 
 export const appContext = React.createContext<AppContextType>(
     {} as AppContextType
@@ -51,6 +50,7 @@ const Provider = ({children}: any) => {
             headers: {
                 "Content-Type": "application/json",
             },
+             credentials: "include"
         };
 
         const onSuccess = (data: any) => {
@@ -59,7 +59,7 @@ const Provider = ({children}: any) => {
         const onError = (err: any) => {
             navigate(signUrl)
         };
-        fetchJSON(`${serverUrl}/login?token=${token}`, payLoad, onSuccess, onError);
+        fetchJSON(`${serverUrl}/login`, payLoad, onSuccess, onError);
     };
 
 

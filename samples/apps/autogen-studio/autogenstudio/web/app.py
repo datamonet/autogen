@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from bson.objectid import ObjectId
 from typing import Any, Union
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
@@ -25,6 +25,8 @@ from ..profiler import Profiler
 from ..utils import check_and_cast_datetime_fields, init_app_folders, md5_hash, test_model
 from ..database.mongo_client import db
 from ..version import VERSION
+
+cookie_name = "__Secure-next-auth.session-token"
 
 profiler = Profiler()
 managers = {"chat": None}  # manage calls to autogen
@@ -153,9 +155,9 @@ def delete_entity(model_class: Any, filters: dict = None):
 
 
 @api.get("/login")
-async def get_user(token: str):
+async def get_user(request: Request):
     """get user info from mongodb"""
-    print('web site',token)
+    token = request.cookies.get(cookie_name)
     payload = jwt.decode(token, options={"verify_signature": False})
     user = db["users"].find_one({"email": payload.get("email")})
     if user:
