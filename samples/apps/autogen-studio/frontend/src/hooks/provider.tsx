@@ -23,7 +23,6 @@ export interface AppContextType {
     user: IUser | null;
     setUser: any;
     logout: any;
-    cookie_name: string;
     darkMode: string;
     setDarkMode: any;
 }
@@ -41,9 +40,6 @@ const Provider = ({children}: any) => {
         storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
     );
     const [user, setUser] = useState<IUser | null>(null);
-    const token = getCookie(cookie_name);
-    // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZheWVfMTIyNUAxNjMuY29tIiwiZXhwIjoxNzI0ODI2NzgwLCJpc3MiOiJTRUxGX0hPU1RFRCIsInN1YiI6IkNvbnNvbGUgQVBJIFBhc3Nwb3J0In0.Dble_hdNJojtfxDlE9WBnAwk3BGBNvCf8GN5BueslD4'
-
     const fetchUser = () => {
         const payLoad = {
             method: "GET",
@@ -77,7 +73,7 @@ const Provider = ({children}: any) => {
     useMemo(() => {
         // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
         fetchUser()
-    }, [token])
+    }, [])
 
     return (
         <appContext.Provider
@@ -85,7 +81,6 @@ const Provider = ({children}: any) => {
                 user,
                 setUser,
                 logout,
-                cookie_name,
                 darkMode,
                 setDarkMode: updateDarkMode,
             }}
