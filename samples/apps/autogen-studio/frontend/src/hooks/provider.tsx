@@ -52,7 +52,7 @@ const Provider = ({children}: any) => {
         const onSuccess = (data: any) => {
             if (!data) return navigate(signUrl)
              setUser(data)
-             // setLocalStorage("user_info", data);
+             setLocalStorage("user_info", data);
         };
         const onError = (err: any) => {
             navigate(signUrl)
@@ -63,7 +63,7 @@ const Provider = ({children}: any) => {
 
     const logout = () => {
          const payLoad = {
-            method: "GET",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -72,7 +72,7 @@ const Provider = ({children}: any) => {
 
         const onSuccess = () => {
             setUser(null);
-            // setLocalStorage("user_info", {});
+            setLocalStorage("user_info", {});
             navigate(signUrl)
         };
         const onError = (err: any) => {
@@ -89,6 +89,9 @@ const Provider = ({children}: any) => {
 
     useMemo(() => {
         // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
+        const userInfo = getLocalStorage("user_info" );
+        console.log('userInfo',userInfo)
+        console.log('user',user)
         if (user === null) fetchUser()
     }, [])
 
