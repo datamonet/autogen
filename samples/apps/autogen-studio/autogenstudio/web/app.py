@@ -157,18 +157,32 @@ def delete_entity(model_class: Any, filters: dict = None):
 @api.get("/login")
 async def get_user(request: Request):
     """get user info from mongodb"""
-    token = request.cookies.get(cookie_name)
-    payload = jwt.decode(token, options={"verify_signature": False})
-    user = db["users"].find_one({"email": payload.get("email")})
-    if user:
-        user["id"] = str(user.pop("_id"))
-    return user
+    try:
+        token = request.cookies.get(cookie_name)
+
+        payload = jwt.decode(token, options={"verify_signature": False})
+        user = db["users"].find_one({"email": payload.get("email")})
+        if user:
+            user["id"] = str(user.pop("_id"))
+        return user
+    except Exception as ex_error:
+        return {
+            "status": False,
+            "message": str(ex_error),
+        }
 
 
 @api.get("/logout")
 async def get_user(response: FastAPIResponse):
-    response.delete_cookie(key=cookie_name, path="/", domain=".takin.ai")
-    return {"message": "Cookie deleted"}
+    try:
+        response.delete_cookie(key=cookie_name, path="/", domain=".takin.ai")
+        return {"message": "Cookie deleted"}
+    except Exception as ex_error:
+        return {
+            "status": False,
+            "message": str(ex_error),
+        }
+
 
 class UpdatePayload(BaseModel):
     user_id: str

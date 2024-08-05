@@ -51,9 +51,10 @@ const Provider = ({children}: any) => {
         };
 
         const onSuccess = (data: any) => {
-            if (!data) return navigate(signUrl)
+            if (data && !data['status']) return navigate(signUrl)
              setUser(data)
              setLocalStorage("user_info", data);
+             setInit(true);
         };
         const onError = (err: any) => {
             navigate(signUrl)
@@ -71,9 +72,10 @@ const Provider = ({children}: any) => {
              credentials: "include"
         };
 
-        const onSuccess = () => {
+        const onSuccess = (data: any) => {
+            if (data && !data['status']) return
             setUser(null);
-            setLocalStorage("user_info", {});
+            setLocalStorage("user_info", null);
             navigate(signUrl)
         };
         const onError = (err: any) => {
@@ -90,11 +92,14 @@ const Provider = ({children}: any) => {
 
     useMemo(() => {
         // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
-        const userInfo = getLocalStorage("user_info" );
-        if (userInfo || user) {
-            setUser(userInfo)
-            return setInit(true)
+        const userInfo = getLocalStorage("user_info");
+
+        if (userInfo !== null) {
+            setUser(userInfo);
+            setInit(true);
+            return;
         }
+
         fetchUser()
     }, [])
 
