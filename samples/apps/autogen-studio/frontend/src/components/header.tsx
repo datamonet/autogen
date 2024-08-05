@@ -183,8 +183,7 @@ const Header = ({ meta, link }: any) => {
 
                             <Menu.Item>
                               {({ active }) => (
-                                <a
-                                  href="#"
+                                <span
                                   onClick={() => {
                                     logout();
                                   }}
@@ -194,7 +193,7 @@ const Header = ({ meta, link }: any) => {
                                   )}
                                 >
                                   Sign out
-                                </a>
+                                </span>
                               )}
                             </Menu.Item>
                           </Menu.Items>

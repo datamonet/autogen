@@ -40,6 +40,7 @@ const Provider = ({children}: any) => {
         storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
     );
     const [user, setUser] = useState<IUser | null>(null);
+    const [init, setInit] = useState(false);
     const fetchUser = () => {
         const payLoad = {
             method: "GET",
@@ -63,7 +64,7 @@ const Provider = ({children}: any) => {
 
     const logout = () => {
          const payLoad = {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -90,9 +91,11 @@ const Provider = ({children}: any) => {
     useMemo(() => {
         // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
         const userInfo = getLocalStorage("user_info" );
-        console.log('userInfo',userInfo)
-        console.log('user',user)
-        if (user === null) fetchUser()
+        if (userInfo || user) {
+            setUser(userInfo)
+            return setInit(true)
+        }
+        fetchUser()
     }, [])
 
     return (
@@ -105,7 +108,7 @@ const Provider = ({children}: any) => {
                 setDarkMode: updateDarkMode,
             }}
         >
-            {user ? children :
+            {init ? children :
                 <div className="w-full text-center py-20 flex flex-col space-y-4">
                     <BounceLoader className="bg-gray-900"/>
                     <p className="inline-block">loading ..</p>
