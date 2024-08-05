@@ -179,7 +179,7 @@ async def get_user(request: Request):
 @api.get("/logout")
 async def get_user(response: FastAPIResponse):
     try:
-        response.delete_cookie(key=cookie_name, path="/", domain="localhost")
+        response.delete_cookie(key=cookie_name, path="/", domain="takin.ai")
         return {
                 "status": True,
                 "message": "Cookie deleted",
