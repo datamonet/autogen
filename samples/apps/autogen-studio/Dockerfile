@@ -2,7 +2,7 @@ FROM python:3.10
 
 # Install dependencies
 RUN pip install -U gunicorn autogenstudio
-RUN pip install PyJWT pymongo
+RUN pip install -U PyJWT pymongo psycopg2-binary
 
 # Create the user
 RUN useradd -m -u 1000 user

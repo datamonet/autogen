@@ -21,6 +21,7 @@ classifiers = [
 dependencies = [
     "PyJWT",
     "pymongo",
+
     "pydantic",
     "fastapi",
     "typer",
@@ -32,6 +33,7 @@ dependencies = [
     "numpy < 2.0.0",
     "sqlmodel",
     "psycopg",
+    "psycopg2-binary",
     "alembic",
     "loguru",
 ]

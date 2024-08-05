@@ -34,8 +34,9 @@ class DBManager:
     _init_lock = threading.Lock()  # Class-level lock
 
     def __init__(self, engine_uri: str):
-        connection_args = {"check_same_thread": True} if "sqlite" in engine_uri else {}
-        self.engine = create_engine(engine_uri, connect_args=connection_args)
+        # takin command: 修改数据库
+        # connection_args = {"check_same_thread": True} if "sqlite" in engine_uri else {}
+        self.engine = create_engine(engine_uri)
         # run_migration(engine_uri=engine_uri)
 
     def create_db_and_tables(self):
