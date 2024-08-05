@@ -165,6 +165,11 @@ async def get_user(request: Request):
     return user
 
 
+@api.get("/logout")
+async def get_user(response: Response):
+    response.delete_cookie(key=cookie_name, path="/", domain=".takin.ai")
+    return {"message": "Cookie deleted"}
+
 class UpdatePayload(BaseModel):
     user_id: str
     message_id: int

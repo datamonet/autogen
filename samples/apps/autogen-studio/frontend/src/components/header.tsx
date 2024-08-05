@@ -228,7 +228,7 @@ const Header = ({ meta, link }: any) => {
               Dark mode <DarkModeToggle />{" "}
             </div>
             {user && (
-              <div className="pt-4 pb-3 border-t border-secondary">
+              <div className="pt-4 pb-3 border-t border-secondary z-50">
                 <div className="flex items-center px-4">
                   <div className="flex-shrink-0">
                     {userAvatarUrl && (
@@ -258,8 +258,6 @@ const Header = ({ meta, link }: any) => {
                 </div>
                 <div className="mt-3 space-y-1">
                   <Disclosure.Button
-                    as="a"
-                    href="#"
                     onClick={() => logout()}
                     className="block px-4 py-2 text-base font-medium text-secondary hover:text-primary "
                   >

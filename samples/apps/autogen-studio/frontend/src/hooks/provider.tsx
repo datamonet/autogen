@@ -50,7 +50,9 @@ const Provider = ({children}: any) => {
         };
 
         const onSuccess = (data: any) => {
-            data ? setUser(data) : navigate(signUrl)
+            if (!data) return navigate(signUrl)
+             setUser(data)
+             // setLocalStorage("user_info", data);
         };
         const onError = (err: any) => {
             navigate(signUrl)
@@ -60,9 +62,24 @@ const Provider = ({children}: any) => {
 
 
     const logout = () => {
-        setUser(null);
-        eraseCookie(cookie_name);
-        navigate(signUrl)
+         const payLoad = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+             credentials: "include"
+        };
+
+        const onSuccess = () => {
+            setUser(null);
+            // setLocalStorage("user_info", {});
+            navigate(signUrl)
+        };
+        const onError = (err: any) => {
+            navigate(signUrl)
+        };
+        fetchJSON(`${serverUrl}/logout`, payLoad, onSuccess, onError);
+
     };
 
     const updateDarkMode = (darkMode: string) => {
@@ -72,7 +89,7 @@ const Provider = ({children}: any) => {
 
     useMemo(() => {
         // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
-        fetchUser()
+        if (user === null) fetchUser()
     }, [])
 
     return (
