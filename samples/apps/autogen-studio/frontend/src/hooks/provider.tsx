@@ -52,8 +52,8 @@ const Provider = ({children}: any) => {
 
         const onSuccess = (data: any) => {
             if (data && !data['status']) return navigate(signUrl)
-             setUser(data)
-             setLocalStorage("user_info", data);
+             setUser(data.data)
+             setLocalStorage("user_info", data.data);
              setInit(true);
         };
         const onError = (err: any) => {
@@ -93,8 +93,8 @@ const Provider = ({children}: any) => {
     useMemo(() => {
         // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
         const userInfo = getLocalStorage("user_info");
-
-        if (userInfo !== null) {
+        console.log(userInfo)
+        if (userInfo !== null && Object.keys(userInfo).length > 0) {
             setUser(userInfo);
             setInit(true);
             return;

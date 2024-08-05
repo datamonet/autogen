@@ -189,7 +189,7 @@ const Header = ({ meta, link }: any) => {
                                   }}
                                   className={classNames(
                                     active ? "bg-secondary" : "",
-                                    "block px-4 py-2 text-sm text-primary"
+                                    "block px-4 py-2 text-sm text-primary cursor-pointer"
                                   )}
                                 >
                                   Sign out
@@ -258,7 +258,7 @@ const Header = ({ meta, link }: any) => {
                 <div className="mt-3 space-y-1">
                   <Disclosure.Button
                     onClick={() => logout()}
-                    className="block px-4 py-2 text-base font-medium text-secondary hover:text-primary "
+                    className="block px-4 py-2 text-base font-medium text-secondary hover:text-primary cursor-pointer"
                   >
                     Sign out
                   </Disclosure.Button>

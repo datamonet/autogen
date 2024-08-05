@@ -164,7 +164,11 @@ async def get_user(request: Request):
         user = db["users"].find_one({"email": payload.get("email")})
         if user:
             user["id"] = str(user.pop("_id"))
-        return user
+        return  {
+                "status": True,
+                "data": user
+            }
+
     except Exception as ex_error:
         return {
             "status": False,
@@ -175,8 +179,11 @@ async def get_user(request: Request):
 @api.get("/logout")
 async def get_user(response: FastAPIResponse):
     try:
-        response.delete_cookie(key=cookie_name, path="/", domain=".takin.ai")
-        return {"message": "Cookie deleted"}
+        response.delete_cookie(key=cookie_name, path="/", domain="localhost")
+        return {
+                "status": True,
+                "message": "Cookie deleted",
+            }
     except Exception as ex_error:
         return {
             "status": False,
