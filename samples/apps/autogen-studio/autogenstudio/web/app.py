@@ -26,7 +26,7 @@ from ..utils import check_and_cast_datetime_fields, init_app_folders, md5_hash, 
 from ..database.mongo_client import db
 from ..version import VERSION
 
-cookie_name = "next-auth.session-token"
+cookie_name = "__Secure-next-auth.session-token"
 
 profiler = Profiler()
 managers = {"chat": None}  # manage calls to autogen
