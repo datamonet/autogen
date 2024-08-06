@@ -2,8 +2,7 @@ import React, {useState, useMemo} from "react";
 import {navigate} from "@reach/router"
 import {
     fetchJSON,
-    getCookie,
-    getLocalStorage, eraseCookie,
+    getLocalStorage,
     setLocalStorage, getServerUrl,
 } from "../components/utils";
 import {BounceLoader} from "../components/atoms";
@@ -47,14 +46,25 @@ const Provider = ({children}: any) => {
             headers: {
                 "Content-Type": "application/json",
             },
-             credentials: "include"
+            credentials: "include"
         };
 
         const onSuccess = (data: any) => {
-            if (data && !data['status']) return navigate(signUrl)
-             setUser(data.data)
-             setLocalStorage("user_info", data.data);
-             setInit(true);
+            if (data && !data['status']) {
+                setUser(null);
+                setLocalStorage("user_info", null);
+                navigate(signUrl);
+                return;
+            }
+            const userInfo = getLocalStorage("user_info");
+            if (userInfo !== null) {
+                setUser(userInfo);
+                setInit(true);
+                return;
+            }
+            setUser(data.data)
+            setLocalStorage("user_info", data.data);
+            setInit(true);
         };
         const onError = (err: any) => {
             navigate(signUrl)
@@ -64,12 +74,12 @@ const Provider = ({children}: any) => {
 
 
     const logout = () => {
-         const payLoad = {
+        const payLoad = {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
-             credentials: "include"
+            credentials: "include"
         };
 
         const onSuccess = (data: any) => {
@@ -92,14 +102,6 @@ const Provider = ({children}: any) => {
 
     useMemo(() => {
         // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
-        const userInfo = getLocalStorage("user_info");
-        console.log(userInfo)
-        if (userInfo !== null && Object.keys(userInfo).length > 0) {
-            setUser(userInfo);
-            setInit(true);
-            return;
-        }
-
         fetchUser()
     }, [])
 
