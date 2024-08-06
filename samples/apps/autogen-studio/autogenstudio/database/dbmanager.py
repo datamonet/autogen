@@ -105,8 +105,6 @@ class DBManager:
         status_message = ""
 
         try:
-            print(filters)
-            print(getattr(model_class, 'public') == 'True' )
             if filters:
                 conditions = [getattr(model_class, col) == value for col, value in filters.items()]
                 #takin command: 添加 public 状态为 true 的过滤条件
