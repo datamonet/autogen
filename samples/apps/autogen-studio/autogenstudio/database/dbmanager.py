@@ -4,7 +4,7 @@ from typing import Optional
 
 from loguru import logger
 from sqlalchemy import exc
-from sqlmodel import Session, SQLModel, and_, create_engine, select
+from sqlmodel import Session, SQLModel, and_, create_engine, select, or_
 
 from ..datamodel import (
     Agent,
@@ -105,11 +105,20 @@ class DBManager:
         status_message = ""
 
         try:
+            print(filters)
+            print(getattr(model_class, 'public') == 'True' )
             if filters:
                 conditions = [getattr(model_class, col) == value for col, value in filters.items()]
-                statement = select(model_class).where(and_(*conditions))
+                #takin command: 添加 public 状态为 true 的过滤条件
+                # 添加 public 状态为 true 的过滤条件
+                if hasattr(model_class, "public"):
+                    public_condition = getattr(model_class, "public") == True
+                    conditions.append(public_condition)
 
-                if hasattr(model_class, "created_at") and order:
+                # 使用 or_ 组合条件
+                statement = select(model_class).where(or_(*conditions)) if conditions else select(model_class)
+
+            if hasattr(model_class, "created_at") and order:
                     if order == "desc":
                         statement = statement.order_by(model_class.created_at.desc())
                     else:

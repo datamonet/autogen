@@ -11,6 +11,7 @@ from sqlmodel import (
     Relationship,
     SQLModel,
     func,
+    Boolean
 )
 from sqlmodel import (
     Enum as SqlEnum,
@@ -99,7 +100,8 @@ class Skill(SQLModel, table=True):
     secrets: Optional[List[dict]] = Field(default_factory=list, sa_column=Column(JSON))
     libraries: Optional[List[str]] = Field(default_factory=list, sa_column=Column(JSON))
     agents: List["Agent"] = Relationship(back_populates="skills", link_model=AgentSkillLink)
-
+    # 添加 public 字段，默认值为 False
+    public: bool = Field(default=False, sa_column=Column(Boolean, default=False))
 
 class LLMConfig(SQLModel, table=False):
     """Data model for LLM Config for AutoGen"""
@@ -231,6 +233,9 @@ class Agent(SQLModel, table=True):
         ),
     )
     task_instruction: Optional[str] = None
+    # 添加 public 字段，默认值为 False
+    public: bool = Field(default=False, sa_column=Column(Boolean, default=False))
+
 
 
 class WorkFlowType(str, Enum):
@@ -266,6 +271,9 @@ class Workflow(SQLModel, table=True):
         sa_column=Column(SqlEnum(WorkFlowSummaryMethod)),
     )
     sample_tasks: Optional[List[str]] = Field(default_factory=list, sa_column=Column(JSON))
+    # 添加 public 字段，默认值为 False
+    public: bool = Field(default=False, sa_column=Column(Boolean, default=False))
+
 
 
 class Response(SQLModel):
