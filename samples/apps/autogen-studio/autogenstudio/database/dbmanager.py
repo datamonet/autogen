@@ -102,19 +102,26 @@ class DBManager:
         """List all entities"""
         result = []
         status = True
+        or_flag = False
         status_message = ""
 
         try:
+            # takin command: 查询条件加上public
             if filters:
                 conditions = [getattr(model_class, col) == value for col, value in filters.items()]
-                #takin command: 添加 public 状态为 true 的过滤条件
-                # 添加 public 状态为 true 的过滤条件
+                and_condition = and_(*conditions)
+
                 if hasattr(model_class, "public"):
                     public_condition = getattr(model_class, "public") == True
-                    conditions.append(public_condition)
-
-                # 使用 or_ 组合条件
-                statement = select(model_class).where(or_(*conditions)) if conditions else select(model_class)
+                    statement = select(model_class).where(or_(and_condition, public_condition))
+                else:
+                    statement = select(model_class).where(and_condition)
+            else:
+                if hasattr(model_class, "public"):
+                    public_condition = getattr(model_class, "public") == True
+                    statement = select(model_class).where(public_condition)
+                else:
+                    statement = select(model_class)
 
             if hasattr(model_class, "created_at") and order:
                     if order == "desc":

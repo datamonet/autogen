@@ -317,7 +317,7 @@ const ChatBox = ({
     console.log("messages updated, scrolling",messages);
     if (messages && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      if (lastMessage.text === "TERMINATE") {
+      if ((lastMessage.meta.usage || []).length>0) {
         updateCredits(lastMessage);
       }
     }
