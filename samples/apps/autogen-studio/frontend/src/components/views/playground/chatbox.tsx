@@ -25,7 +25,7 @@ import {
   IStatus,
   IWorkflow,
 } from "../../types";
-import { examplePrompts, fetchJSON, getServerUrl, guid } from "../../utils";
+import {examplePrompts, fetchJSON, getServerUrl, guid, setLocalStorage} from "../../utils";
 import { appContext } from "../../../hooks/provider";
 import MetaDataView from "./metadata";
 import {
@@ -303,6 +303,7 @@ const ChatBox = ({
 
     const onSuccess = (data: any) => {
       setUser({...user,...data})
+      setLocalStorage("user_info", {...user,...data});
     };
     const onError = (err: any) => {
       console.log(err)
