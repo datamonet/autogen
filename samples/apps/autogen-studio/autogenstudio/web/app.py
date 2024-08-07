@@ -216,7 +216,7 @@ async def update_user(item: UpdatePayload):
 
         # 计算总费用
         total_usd = sum(item.get("total_cost", 0) for item in profile.get("usage", []))
-        cost = total_usd * 100 * 1.25
+        cost = total_usd * 100 * 1.5
 
         # 保证最低消费为0.01
         total_cost = max(round(cost, 2), 0.01)
