@@ -315,12 +315,15 @@ const ChatBox = ({
   React.useEffect(() => {
     // takin command: messgaes updated，判断最后一个是否是TERMINATE，如果是则进行扣费操作
     console.log("messages updated, scrolling",messages);
-    if (messages && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if ((lastMessage.meta.usage || []).length>0) {
-        updateCredits(lastMessage);
-      }
+      if (messages && messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+
+        // Check if meta and meta.usage exist and if meta.usage is an array
+        if (lastMessage.meta && Array.isArray(lastMessage.meta.usage) && lastMessage.meta.usage.length > 0) {
+            updateCredits(lastMessage);
+        }
     }
+
     setTimeout(() => {
       scrollChatBox(messageBoxInputRef);
     }, 500);
