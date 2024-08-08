@@ -284,30 +284,32 @@ export const AgentConfigView = ({
                     />
                   }
                 />
-                <ControlRowView
-                  title="Code Execution Config"
-                  className="mt-4"
-                  description="Determines if and where code execution is done."
-                  value={agent.config.code_execution_config || "none"}
-                  control={
-                    <Select
-                      className="mt-2 w-full"
-                      defaultValue={
-                        agent.config.code_execution_config || "none"
-                      }
-                      onChange={(value: any) => {
-                        onControlChange(value, "code_execution_config");
-                      }}
-                      options={
-                        [
-                          { label: "None", value: "none" },
-                          { label: "Local", value: "local" },
-                          { label: "Docker", value: "docker" },
-                        ] as any
-                      }
-                    />
-                  }
-                />
+
+                {/*takin command:隐藏docker选项*/}
+                {/*<ControlRowView*/}
+                {/*  title="Code Execution Config"*/}
+                {/*  className="mt-4"*/}
+                {/*  description="Determines if and where code execution is done."*/}
+                {/*  value={agent.config.code_execution_config || "none"}*/}
+                {/*  control={*/}
+                {/*    <Select*/}
+                {/*      className="mt-2 w-full"*/}
+                {/*      defaultValue={*/}
+                {/*        agent.config.code_execution_config || "none"*/}
+                {/*      }*/}
+                {/*      onChange={(value: any) => {*/}
+                {/*        onControlChange(value, "code_execution_config");*/}
+                {/*      }}*/}
+                {/*      options={*/}
+                {/*        [*/}
+                {/*          { label: "None", value: "none" },*/}
+                {/*          { label: "Local", value: "local" },*/}
+                {/*          { label: "Docker", value: "docker" },*/}
+                {/*        ] as any*/}
+                {/*      }*/}
+                {/*    />*/}
+                {/*  }*/}
+                {/*/>*/}
               </CollapseBox>
             </div>
           </div>
