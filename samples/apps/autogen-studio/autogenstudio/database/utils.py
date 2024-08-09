@@ -142,231 +142,203 @@ def run_migration(engine_uri: str):
 
 
 def init_db_samples(dbmanager: Any):
-    # Check if workflows already exist
-    workflows = dbmanager.get(Workflow).data
-    workflow_names = [w.name for w in workflows]
-    if "Default Workflow" in workflow_names and "Travel Planning Workflow" in workflow_names:
-        logger.info("Database already initialized with Default and Travel Planning Workflows")
-        return
-    logger.info("Initializing database with Default and Travel Planning Workflows")
-
-    # Define helper function to check if a model already exists
-    def model_exists(model_name: str) -> bool:
-        return any(model.model == model_name for model in dbmanager.get(Model).data)
-
-    # Define helper function to check if a skill already exists
-    def skill_exists(skill_name: str) -> bool:
-        return any(skill.name == skill_name for skill in dbmanager.get(Skill).data)
-
-    # Define helper function to check if an agent already exists
-    def agent_exists(agent_name: str) -> bool:
-        return any(agent.name == agent_name for agent in dbmanager.get(Agent).data)
-
-    # Define helper function to check if a workflow already exists
-    def workflow_exists(workflow_name: str) -> bool:
-        return any(workflow.name == workflow_name for workflow in dbmanager.get(Workflow).data)
-
-    # Models
-    if not model_exists("gemini-1.5-pro-latest"):
-        google_gemini_model = Model(
-            model="gemini-1.5-pro-latest",
-            description="Google's Gemini model",
-            user_id="curator@takin.ai",
-            api_type="google",
-        )
-        dbmanager.add(google_gemini_model)
-
-    if not model_exists("gpt4-turbo"):
-        azure_model = Model(
-            model="gpt4-turbo",
-            description="Azure OpenAI model",
-            user_id="curator@takin.ai",
-            api_type="azure",
-            base_url="https://api.your azureendpoint.com/v1",
-        )
-        dbmanager.add(azure_model)
-
-    if not model_exists("zephyr"):
-        zephyr_model = Model(
-            model="zephyr",
-            description="Local Huggingface Zephyr model via vLLM, LMStudio or Ollama",
-            base_url="http://localhost:1234/v1",
-            user_id="curator@takin.ai",
-            api_type="open_ai",
-        )
-        dbmanager.add(zephyr_model)
-
-    if not model_exists("gpt-4-1106-preview"):
-        gpt_4_model = Model(
-            model="gpt-4-1106-preview",
-            description="OpenAI GPT-4 model",
-            user_id="curator@takin.ai",
-            api_type="open_ai",
-        )
-        dbmanager.add(gpt_4_model)
-
-    # Skills
-    if not skill_exists("generate_and_save_pdf"):
-        generate_pdf_skill = Skill(
-            name="generate_and_save_pdf",
-            description="Generate and save a pdf file based on the provided input sections.",
-            user_id="curator@takin.ai",
-            public=True,
-            libraries=["requests", "fpdf", "PIL"],
-            content='import uuid\nimport requests\nfrom fpdf import FPDF\nfrom typing import List, Dict, Optional\nfrom pathlib import Path\nfrom PIL import Image, ImageDraw, ImageOps\nfrom io import BytesIO\n\n... (content omitted for brevity)',
-        )
-        dbmanager.add(generate_pdf_skill)
-
-    if not skill_exists("generate_and_save_images"):
-        generate_image_skill = Skill(
-            name="generate_and_save_images",
-            secrets=[{"secret": "OPENAI_API_KEY", "value": None}],
-            libraries=["openai"],
-            public=True,
-            description="Generate and save images based on a user's query.",
-            content='\nfrom typing import List\nimport uuid\nimport requests  # to perform HTTP requests\nfrom pathlib import Path\n\nfrom openai import OpenAI\n\n\ndef generate_and_save_images(query: str, image_size: str = "1024x1024") -> List[str]:\n    """\n    Function to paint, draw or illustrate images based on the users query or request. Generates images from a given query using OpenAI\'s DALL-E model and saves them to disk.  Use the code below anytime there is a request to create an image.\n\n    :param query: A natural language description of the image to be generated.\n    :param image_size: The size of the image to be generated. (default is "1024x1024")\n    :return: A list of filenames for the saved images.\n    """\n\n    client = OpenAI()  # Initialize the OpenAI client\n    response = client.images.generate(model="dall-e-3", prompt=query, n=1, size=image_size)  # Generate images\n\n    ... (content omitted for brevity)',
-            user_id="curator@takin.ai",
-        )
-        dbmanager.add(generate_image_skill)
-
-    # Agents
-    if not agent_exists("planner_assistant"):
-        planner_assistant_config = AgentConfig(
-            name="planner_assistant",
-            description="Assistant Agent",
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=25,
-            system_message="You are a helpful assistant that can suggest a travel plan for a user and utilize any context information provided. You are the primary coordinator who will receive suggestions or advice from other agents (local_assistant, language_assistant). You must ensure that the final plan integrates the suggestions from other agents or team members. YOUR FINAL RESPONSE MUST BE THE COMPLETE PLAN. When the plan is complete and all perspectives are integrated, you can respond with TERMINATE.",
-            code_execution_config=CodeExecutionConfigTypes.none,
-            llm_config={},
-        )
-        planner_assistant = Agent(
-            user_id="curator@takin.ai",
-            type=AgentType.assistant,
-            public=True,
-            config=planner_assistant_config.model_dump(mode="json"),
-        )
-        dbmanager.add(planner_assistant)
-
-    if not agent_exists("local_assistant"):
-        local_assistant_config = AgentConfig(
-            name="local_assistant",
-            description="Local Assistant Agent",
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=25,
-            system_message="You are a local assistant that can suggest local activities or places to visit for a user and can utilize any context information provided. You can suggest local activities, places to visit, restaurants to eat at, etc. You can also provide information about the weather, local events, etc. You can provide information about the local area, but you cannot suggest a complete travel plan. You can only provide information about the local area.",
-            code_execution_config=CodeExecutionConfigTypes.none,
-            llm_config={},
-        )
-        local_assistant = Agent(
-            user_id="curator@takin.ai",
-            public=True,
-            type=AgentType.assistant,
-            config=local_assistant_config.model_dump(mode="json"),
-        )
-        dbmanager.add(local_assistant)
-
-    if not agent_exists("language_assistant"):
-        language_assistant_config = AgentConfig(
-            name="language_assistant",
-            description="Language Assistant Agent",
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=25,
-            system_message="You are a helpful assistant that can review travel plans, providing feedback on important/critical tips about how best to address language or communication challenges for the given destination. If the plan already includes language tips, you can mention that the plan is satisfactory, with rationale.",
-            code_execution_config=CodeExecutionConfigTypes.none,
-            llm_config={},
-        )
-        language_assistant = Agent(
-            user_id="curator@takin.ai",
-            public=True,
-            type=AgentType.assistant,
-            config=language_assistant_config.model_dump(mode="json"),
-        )
-        dbmanager.add(language_assistant)
-
-    if not agent_exists("travel_groupchat"):
-        travel_groupchat_config = AgentConfig(
-            name="travel_groupchat",
-            admin_name="groupchat",
-            description="Group Chat Agent Configuration",
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=25,
-            system_message="You are a group chat manager",
-            code_execution_config=CodeExecutionConfigTypes.none,
-            default_auto_reply="TERMINATE",
-            llm_config={},
-            speaker_selection_method="auto",
-        )
-        travel_groupchat_agent = Agent(
-            user_id="curator@takin.ai",
-            public=True,
-            type=AgentType.groupchat,
-            config=travel_groupchat_config.model_dump(mode="json"),
-        )
-        dbmanager.add(travel_groupchat_agent)
-
-    if not agent_exists("user_proxy"):
-        user_proxy_config = AgentConfig(
-            name="user_proxy",
-            description="User Proxy Agent Configuration",
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=25,
-            system_message="You are a helpful assistant",
-            code_execution_config=CodeExecutionConfigTypes.local,
-            default_auto_reply="TERMINATE",
-            llm_config=False,
-        )
-        user_proxy = Agent(
-            user_id="curator@takin.ai",
-            public=True,
-            type=AgentType.userproxy,
-            config=user_proxy_config.model_dump(mode="json"),
-        )
-        dbmanager.add(user_proxy)
-
-    if not agent_exists("default_assistant"):
-        default_assistant_config = AgentConfig(
-            name="default_assistant",
-            description="Assistant Agent",
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=25,
-            system_message="You are a helpful assistant that can handle any request.",
-            code_execution_config=CodeExecutionConfigTypes.none,
-            llm_config={},
-        )
-        default_assistant = Agent(
-            user_id="curator@takin.ai",
-            public=True,
-            type=AgentType.assistant,
-            config=default_assistant_config.model_dump(mode="json"),
-        )
-        dbmanager.add(default_assistant)
-
-    # Workflows
-    if not workflow_exists("Default Workflow"):
-        default_workflow = Workflow(
-            name="Default Workflow",
-            description="Default workflow for testing",
-            user_id="curator@takin.ai",
-            steps=[
-                {"step_name": "generate_pdf", "description": "Generate a PDF file", "skill_name": "generate_and_save_pdf"},
-                {"step_name": "generate_image", "description": "Generate an image", "skill_name": "generate_and_save_images"},
-            ]
-        )
-        dbmanager.add(default_workflow)
-
-    if not workflow_exists("Travel Planning Workflow"):
-        travel_workflow = Workflow(
-            name="Travel Planning Workflow",
-            description="Workflow for planning travel",
-            user_id="curator@takin.ai",
-            steps=[
-                {"step_name": "generate_pdf", "description": "Generate a travel PDF", "skill_name": "generate_and_save_pdf"},
-                {"step_name": "generate_image", "description": "Generate a travel image", "skill_name": "generate_and_save_images"},
-            ]
-        )
-        dbmanager.add(travel_workflow)
-
-    # Commit all changes
-    dbmanager.commit()
-    logger.info("Database initialized successfully.")
+    ...
+    # 初始化数据库，注释避免部署的时候再次运行
+    # workflows = dbmanager.get(Workflow).data
+    # workflow_names = [w.name for w in workflows]
+    # if "Default Workflow" in workflow_names and "Travel Planning Workflow" in workflow_names:
+    #     logger.info("Database already initialized with Default and Travel Planning Workflows")
+    #     return
+    # logger.info("Initializing database with Default and Travel Planning Workflows")
+    # # models
+    # gpt_4o_model = Model(
+    #     model="gpt-4o", description="OpenAI GPT-4o model", user_id="curator@takin.ai", api_type="open_ai"
+    # )
+    # gpt_4o_mini_model = Model(
+    #     model="gpt-4o-mini", description="OpenAI GPT-4o-mini model", user_id="curator@takin.ai", api_type="open_ai"
+    # )
+    # # azure_model = Model(
+    # #     model="gpt4-turbo",
+    # #     description="Azure OpenAI  model",
+    # #     user_id="curator@takin.ai",
+    # #     api_type="azure",
+    # #     base_url="https://api.your azureendpoint.com/v1",
+    # # )
+    # # zephyr_model = Model(
+    # #     model="zephyr",
+    # #     description="Local Huggingface Zephyr model via vLLM, LMStudio or Ollama",
+    # #     base_url="http://localhost:1234/v1",
+    # #     user_id="curator@takin.ai",
+    # #     api_type="open_ai",
+    # # )
+    # #
+    # # google_gemini_model = Model(
+    # #     model="gemini-1.5-pro-latest",
+    # #     description="Google's Gemini model",
+    # #     user_id="curator@takin.ai",
+    # #     api_type="google",
+    # # )
+    #
+    # # skills
+    #
+    # generate_image_skill = Skill(
+    #     name="generate_images",
+    #     description="Generate and save images based on a user's query.",
+    #     content='\nfrom typing import List\nimport uuid\nimport requests  # to perform HTTP requests\nfrom pathlib import Path\n\nfrom openai import OpenAI\n\n\ndef generate_and_save_images(query: str, image_size: str = "1024x1024") -> List[str]:\n    """\n    Function to paint, draw or illustrate images based on the users query or request. Generates images from a given query using OpenAI\'s DALL-E model and saves them to disk.  Use the code below anytime there is a request to create an image.\n\n    :param query: A natural language description of the image to be generated.\n    :param image_size: The size of the image to be generated. (default is "1024x1024")\n    :return: A list of filenames for the saved images.\n    """\n\n    client = OpenAI()  # Initialize the OpenAI client\n    response = client.images.generate(model="dall-e-3", prompt=query, n=1, size=image_size)  # Generate images\n\n    # List to store the file names of saved images\n    saved_files = []\n\n    # Check if the response is successful\n    if response.data:\n        for image_data in response.data:\n            # Generate a random UUID as the file name\n            file_name = str(uuid.uuid4()) + ".png"  # Assuming the image is a PNG\n            file_path = Path(file_name)\n\n            img_url = image_data.url\n            img_response = requests.get(img_url)\n            if img_response.status_code == 200:\n                # Write the binary content to a file\n                with open(file_path, "wb") as img_file:\n                    img_file.write(img_response.content)\n                    print(f"Image saved to {file_path}")\n                    saved_files.append(str(file_path))\n            else:\n                print(f"Failed to download the image from {img_url}")\n    else:\n        print("No image data found in the response!")\n\n    # Return the list of saved files\n    return saved_files\n\n\n# Example usage of the function:\n# generate_and_save_images("A cute baby sea otter")\n',
+    #     user_id="curator@takin.ai",
+    #     public=True
+    # )
+    #
+    # # agents
+    # user_proxy_config = AgentConfig(
+    #     name="user_proxy",
+    #     description="User Proxy Agent Configuration",
+    #     human_input_mode="NEVER",
+    #     max_consecutive_auto_reply=25,
+    #     system_message="You are a helpful assistant",
+    #     code_execution_config=CodeExecutionConfigTypes.local,
+    #     default_auto_reply="TERMINATE",
+    #     llm_config=False,
+    #     public=True
+    # )
+    # user_proxy = Agent(
+    #     user_id="curator@takin.ai", type=AgentType.userproxy, config=user_proxy_config.model_dump(mode="json"),
+    #     public=True
+    # )
+    #
+    # painter_assistant_config = AgentConfig(
+    #     name="default_assistant",
+    #     description="Assistant Agent",
+    #     human_input_mode="NEVER",
+    #     max_consecutive_auto_reply=25,
+    #     system_message=AssistantAgent.DEFAULT_SYSTEM_MESSAGE,
+    #     code_execution_config=CodeExecutionConfigTypes.none,
+    #     llm_config={},
+    #     public=True
+    # )
+    # painter_assistant = Agent(
+    #     user_id="curator@takin.ai", type=AgentType.assistant, config=painter_assistant_config.model_dump(mode="json"),
+    #     public=True
+    # )
+    #
+    # planner_assistant_config = AgentConfig(
+    #     name="planner_assistant",
+    #     description="Assistant Agent",
+    #     human_input_mode="NEVER",
+    #     max_consecutive_auto_reply=25,
+    #     system_message="You are a helpful assistant that can suggest a travel plan for a user. You are the primary cordinator who will receive suggestions or advice from other agents (local_assistant, language_assistant). You must ensure that the finally plan integrates the suggestions from other agents or team members. YOUR FINAL RESPONSE MUST BE THE COMPLETE PLAN. When the plan is complete and all perspectives are integrated, you can respond with TERMINATE.",
+    #     code_execution_config=CodeExecutionConfigTypes.none,
+    #     llm_config={},
+    #     public=True
+    # )
+    # planner_assistant = Agent(
+    #     user_id="curator@takin.ai", type=AgentType.assistant, config=planner_assistant_config.model_dump(mode="json"),
+    #     public=True
+    # )
+    #
+    # local_assistant_config = AgentConfig(
+    #     name="local_assistant",
+    #     description="Local Assistant Agent",
+    #     human_input_mode="NEVER",
+    #     max_consecutive_auto_reply=25,
+    #     system_message="You are a local assistant that can suggest local activities or places to visit for a user. You can suggest local activities, places to visit, restaurants to eat at, etc. You can also provide information about the weather, local events, etc. You can provide information about the local area, but you cannot suggest a complete travel plan. You can only provide information about the local area.",
+    #     code_execution_config=CodeExecutionConfigTypes.none,
+    #     llm_config={},
+    #     public=True
+    # )
+    # local_assistant = Agent(
+    #     user_id="curator@takin.ai", type=AgentType.assistant, config=local_assistant_config.model_dump(mode="json"),
+    #     public=True
+    # )
+    #
+    # language_assistant_config = AgentConfig(
+    #     name="language_assistant",
+    #     description="Language Assistant Agent",
+    #     human_input_mode="NEVER",
+    #     max_consecutive_auto_reply=25,
+    #     system_message="You are a helpful assistant that can review travel plans, providing feedback on important/critical tips about how best to address language or communication challenges for the given destination. If the plan already includes language tips, you can mention that the plan is satisfactory, with rationale.",
+    #     code_execution_config=CodeExecutionConfigTypes.none,
+    #     llm_config={},
+    #     public=True
+    # )
+    # language_assistant = Agent(
+    #     user_id="curator@takin.ai",
+    #     type=AgentType.assistant,
+    #     config=language_assistant_config.model_dump(mode="json"), public=True
+    # )
+    #
+    # # group chat
+    # travel_groupchat_config = AgentConfig(
+    #     name="travel_groupchat",
+    #     admin_name="groupchat",
+    #     description="Group Chat Agent Configuration",
+    #     human_input_mode="NEVER",
+    #     max_consecutive_auto_reply=25,
+    #     system_message="You are a group chat manager",
+    #     code_execution_config=CodeExecutionConfigTypes.none,
+    #     default_auto_reply="TERMINATE",
+    #     llm_config={},
+    #     speaker_selection_method="auto", public=True
+    # )
+    # travel_groupchat_agent = Agent(
+    #     user_id="curator@takin.ai", type=AgentType.groupchat, config=travel_groupchat_config.model_dump(mode="json"),
+    #     public=True
+    # )
+    #
+    # # workflows
+    # default_workflow = Workflow(name="Default Workflow", description="Default workflow", user_id="curator@takin.ai",
+    #                             public=True)
+    #
+    # travel_workflow = Workflow(
+    #     name="Travel Planning Workflow", description="Travel workflow", user_id="curator@takin.ai", public=True
+    # )
+    #
+    # with Session(dbmanager.engine) as session:
+    #     session.add(gpt_4o_model)
+    #     session.add(gpt_4o_mini_model)
+    #     session.add(generate_image_skill)
+    #     session.add(user_proxy)
+    #     session.add(painter_assistant)
+    #     session.add(travel_groupchat_agent)
+    #     session.add(planner_assistant)
+    #     session.add(local_assistant)
+    #     session.add(language_assistant)
+    #
+    #     session.add(default_workflow)
+    #     session.add(travel_workflow)
+    #     session.commit()
+    #
+    #     dbmanager.link(link_type="agent_model", primary_id=painter_assistant.id, secondary_id=gpt_4o_mini_model.id)
+    #     dbmanager.link(link_type="agent_skill", primary_id=painter_assistant.id, secondary_id=generate_image_skill.id)
+    #     dbmanager.link(
+    #         link_type="workflow_agent", primary_id=default_workflow.id, secondary_id=user_proxy.id, agent_type="sender"
+    #     )
+    #     dbmanager.link(
+    #         link_type="workflow_agent",
+    #         primary_id=default_workflow.id,
+    #         secondary_id=painter_assistant.id,
+    #         agent_type="receiver",
+    #     )
+    #
+    #     # link agents to travel groupchat agent
+    #     dbmanager.link(link_type="agent_agent", primary_id=travel_groupchat_agent.id, secondary_id=planner_assistant.id)
+    #     dbmanager.link(link_type="agent_agent", primary_id=travel_groupchat_agent.id, secondary_id=local_assistant.id)
+    #     dbmanager.link(
+    #         link_type="agent_agent", primary_id=travel_groupchat_agent.id, secondary_id=language_assistant.id
+    #     )
+    #     dbmanager.link(link_type="agent_agent", primary_id=travel_groupchat_agent.id, secondary_id=user_proxy.id)
+    #     dbmanager.link(link_type="agent_model", primary_id=travel_groupchat_agent.id, secondary_id=gpt_4o_mini_model.id)
+    #     dbmanager.link(link_type="agent_model", primary_id=planner_assistant.id, secondary_id=gpt_4o_mini_model.id)
+    #     dbmanager.link(link_type="agent_model", primary_id=local_assistant.id, secondary_id=gpt_4o_mini_model.id)
+    #     dbmanager.link(link_type="agent_model", primary_id=language_assistant.id, secondary_id=gpt_4o_mini_model.id)
+    #
+    #     dbmanager.link(
+    #         link_type="workflow_agent", primary_id=travel_workflow.id, secondary_id=user_proxy.id, agent_type="sender"
+    #     )
+    #     dbmanager.link(
+    #         link_type="workflow_agent",
+    #         primary_id=travel_workflow.id,
+    #         secondary_id=travel_groupchat_agent.id,
+    #         agent_type="receiver",
+    #     )
+    #     logger.info("Successfully initialized database with Default and Travel Planning Workflows")

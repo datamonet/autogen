@@ -599,7 +599,7 @@ const ChatBox = ({
   return (
     <div
       style={{ height: "calc(100vh - " + heightOffset + "px)" }}
-      className="text-primary    relative   rounded  "
+      className="text-primary relative rounded z-10"
       ref={mainDivRef}
     >
       <div
