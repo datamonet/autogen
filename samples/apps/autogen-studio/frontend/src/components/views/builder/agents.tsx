@@ -117,7 +117,7 @@ const AgentsView = ({}: any) => {
   }, []);
 
   const agentRows = (agents || []).map((agent: IAgent, i: number) => {
-    const cardItems = [
+    let cardItems = [
       {
         title: "Download",
         icon: ArrowDownTrayIcon,
@@ -149,6 +149,10 @@ const AgentsView = ({}: any) => {
         },
         hoverText: "Make a Copy",
       },
+
+    ];
+    if (agent.user_id === user?.email){
+      cardItems=[...cardItems,
       {
         title: "Delete",
         icon: TrashIcon,
@@ -157,8 +161,8 @@ const AgentsView = ({}: any) => {
           deleteAgent(agent);
         },
         hoverText: "Delete",
-      },
-    ];
+      },]
+    }
     return (
       <li
         role="listitem"
@@ -174,6 +178,8 @@ const AgentsView = ({}: any) => {
             </div>
           }
           onClick={() => {
+             if (agent.user_id !== user?.email) return message.error('You can\'t edit this skill. Please create your own.');
+
             setSelectedAgent(agent);
             setShowAgentModal(true);
           }}

@@ -122,7 +122,7 @@ const SkillsView = ({}: any) => {
   }, []);
 
   const skillRows = (skills || []).map((skill: ISkill, i: number) => {
-    const cardItems = [
+    let cardItems = [
       {
         title: "Download",
         icon: ArrowDownTrayIcon,
@@ -153,7 +153,12 @@ const SkillsView = ({}: any) => {
         },
         hoverText: "Make a Copy",
       },
-      {
+
+    ];
+    if (skill.user_id === user?.email){
+      cardItems = [
+          ...cardItems,
+        {
         title: "Delete",
         icon: TrashIcon,
         onClick: (e: any) => {
@@ -162,7 +167,8 @@ const SkillsView = ({}: any) => {
         },
         hoverText: "Delete",
       },
-    ];
+      ]
+    }
     return (
       <li key={"skillrow" + i} className=" " style={{ width: "200px" }}>
         <div>
@@ -171,6 +177,8 @@ const SkillsView = ({}: any) => {
             className="h-full p-2 cursor-pointer group"
             title={truncateText(skill.name, 25)}
             onClick={() => {
+               if (skill.user_id !== user?.email) return message.error('You can\'t edit this skill. Please create your own.');
+
               setSelectedSkill(skill);
               setShowSkillModal(true);
             }}

@@ -144,7 +144,7 @@ const ModelsView = ({}: any) => {
   }, []);
 
   const modelRows = (models || []).map((model: IModelConfig, i: number) => {
-    const cardItems = [
+    let cardItems = [
       {
         title: "Download",
         icon: ArrowDownTrayIcon,
@@ -175,7 +175,10 @@ const ModelsView = ({}: any) => {
         },
         hoverText: "Make a Copy",
       },
-      {
+
+    ];
+     if (model.user_id === user?.email) {
+       cardItems = [...cardItems,  {
         title: "Delete",
         icon: TrashIcon,
         onClick: (e: any) => {
@@ -183,8 +186,8 @@ const ModelsView = ({}: any) => {
           deleteModel(model);
         },
         hoverText: "Delete",
-      },
-    ];
+      },]
+     }
     return (
       <li
         role="listitem"
@@ -198,6 +201,8 @@ const ModelsView = ({}: any) => {
             <div className="  ">{truncateText(model.model || "", 20)}</div>
           }
           onClick={() => {
+             if (model.user_id!==user?.email) return message.error('You can\'t edit this model. Please create your own.');
+
             setSelectedModel(model);
             setShowModelModal(true);
           }}

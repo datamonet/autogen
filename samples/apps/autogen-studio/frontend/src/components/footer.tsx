@@ -28,7 +28,7 @@ const Footer = () => {
           href="https://microsoft.github.io/autogen/"
         >
           {" "}
-          AutoGen.
+          AutoGen
         </a>
       </div>
       {version && (

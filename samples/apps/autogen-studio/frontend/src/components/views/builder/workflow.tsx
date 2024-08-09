@@ -119,17 +119,12 @@ const WorkflowView = ({}: any) => {
     }
   }, []);
 
-  React.useEffect(() => {
-    if (selectedWorkflow) {
-      setShowWorkflowModal(true);
-    }
-  }, [selectedWorkflow]);
 
   const [showExportModal, setShowExportModal] = React.useState(false);
 
   const workflowRows = (workflows || []).map(
     (workflow: IWorkflow, i: number) => {
-      const cardItems = [
+      let cardItems = [
         {
           title: "Export",
           icon: CodeBracketSquareIcon,
@@ -170,7 +165,10 @@ const WorkflowView = ({}: any) => {
           },
           hoverText: "Make a Copy",
         },
-        {
+
+      ];
+      if (workflow.user_id===user?.email){
+        cardItems=[...cardItems, {
           title: "Delete",
           icon: TrashIcon,
           onClick: (e: any) => {
@@ -178,8 +176,9 @@ const WorkflowView = ({}: any) => {
             deleteWorkFlow(workflow);
           },
           hoverText: "Delete",
-        },
-      ];
+        },]
+      }
+
       return (
         <li
           key={"workflowrow" + i}
@@ -190,7 +189,10 @@ const WorkflowView = ({}: any) => {
             className="  block p-2 cursor-pointer"
             title={<div className="  ">{truncateText(workflow.name, 25)}</div>}
             onClick={() => {
+              if (workflow.user_id !== user?.email) return message.error('You can\'t edit this workflow. Please create your own.');
+
               setSelectedWorkflow(workflow);
+              setShowWorkflowModal(true);
             }}
           >
             <div
