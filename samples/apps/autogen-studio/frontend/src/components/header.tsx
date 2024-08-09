@@ -70,8 +70,8 @@ const Header = ({ meta, link }: any) => {
             <div className="flex justify-between h-16">
               <div className="flex lg:px-0">
                 <div className="flex flex-shrink-0 justify-center items-center">
-                  <div className="inline-block text-slate-800 bg-primary mr-1 pt-2">
-                    <Logo className="w-20"/>
+                  <div className="inline-block text-slate-900 bg-primary mr-1 pt-2">
+                    <Logo className="w-[100px]"/>
                   </div>
                 </div>
 
