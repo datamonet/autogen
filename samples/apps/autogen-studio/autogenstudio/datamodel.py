@@ -166,8 +166,7 @@ class AgentConfig(SQLModel, table=False):
     max_round: Optional[int] = 100
     speaker_selection_method: Optional[str] = "auto"
     allow_repeat_speaker: Optional[Union[bool, List["AgentConfig"]]] = True
-    # 添加 public 字段，默认值为 False
-    public: bool = Field(default=False, sa_column=Column(Boolean, default=False))
+
 
 
 class AgentType(str, Enum):
