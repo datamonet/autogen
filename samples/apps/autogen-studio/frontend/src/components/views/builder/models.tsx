@@ -201,7 +201,13 @@ const ModelsView = ({}: any) => {
             <div className="  ">{truncateText(model.model || "", 20)}</div>
           }
           onClick={() => {
-             if (model.user_id!==user?.email) return message.error('You can\'t edit this model. Please create your own.');
+             if (model.user_id!==user?.email) {
+               let newModel = { ...sanitizeConfig(model) };
+               newModel.model = `${model.model}_copy`;
+               setNewModel(newModel);
+               setShowNewModelModal(true);
+               return
+             }
 
             setSelectedModel(model);
             setShowModelModal(true);

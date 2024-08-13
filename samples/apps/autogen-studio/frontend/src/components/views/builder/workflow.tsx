@@ -189,7 +189,13 @@ const WorkflowView = ({}: any) => {
             className="  block p-2 cursor-pointer"
             title={<div className="  ">{truncateText(workflow.name, 25)}</div>}
             onClick={() => {
-              if (workflow.user_id !== user?.email) return message.error('You can\'t edit this workflow. Please create your own.');
+              if (workflow.user_id !== user?.email) {
+                let newWorkflow = {...sanitizeConfig(workflow)};
+                newWorkflow.name = `${workflow.name}_copy`;
+                setNewWorkflow(newWorkflow);
+                setShowNewWorkflowModal(true);
+                return
+              }
 
               setSelectedWorkflow(workflow);
               setShowWorkflowModal(true);

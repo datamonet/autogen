@@ -177,7 +177,13 @@ const SkillsView = ({}: any) => {
             className="h-full p-2 cursor-pointer group"
             title={truncateText(skill.name, 25)}
             onClick={() => {
-               if (skill.user_id !== user?.email) return message.error('You can\'t edit this skill. Please create your own.');
+               if (skill.user_id !== user?.email) {
+                 let newSkill = {...sanitizeConfig(skill)};
+                 newSkill.name = `${skill.name}_copy`;
+                 setNewSkill(newSkill);
+                 setShowNewSkillModal(true);
+                 return
+               }
 
               setSelectedSkill(skill);
               setShowSkillModal(true);

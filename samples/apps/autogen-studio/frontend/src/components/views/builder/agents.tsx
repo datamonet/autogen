@@ -178,7 +178,15 @@ const AgentsView = ({}: any) => {
             </div>
           }
           onClick={() => {
-             if (agent.user_id !== user?.email) return message.error('You can\'t edit this skill. Please create your own.');
+             if (agent.user_id !== user?.email) {
+               let newAgent = { ...sanitizeConfig(agent) };
+               newAgent.config.name = `${agent.config.name}_copy`;
+               console.log("newAgent", newAgent);
+               setNewAgent(newAgent);
+               setShowNewAgentModal(true);
+               return
+             }
+
 
             setSelectedAgent(agent);
             setShowAgentModal(true);
