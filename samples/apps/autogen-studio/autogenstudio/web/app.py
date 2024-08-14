@@ -141,11 +141,12 @@ def create_entity(model: Any, model_class: Any, filters: dict = None):
 def list_entity(
         model_class: Any,
         filters: dict = None,
+        or_filters: dict = None,
         return_json: bool = True,
         order: str = "desc",
 ):
     """List all entities for a user"""
-    return dbmanager.get(model_class, filters=filters, return_json=return_json, order=order)
+    return dbmanager.get(model_class, filters=filters, or_filters=or_filters,return_json=return_json, order=order)
 
 
 def delete_entity(model_class: Any, filters: dict = None):
@@ -261,7 +262,8 @@ async def update_user(item: UpdatePayload):
 async def list_skills(user_id: str):
     """List all skills for a user"""
     filters = {"user_id": user_id}
-    return list_entity(Skill, filters=filters)
+
+    return list_entity(Skill, filters=filters,or_filters={"public":True})
 
 
 @api.post("/skills")
@@ -320,7 +322,7 @@ async def delete_model(model_id: int, user_id: str):
 async def list_agents(user_id: str):
     """List all agents for a user"""
     filters = {"user_id": user_id}
-    return list_entity(Agent, filters=filters)
+    return list_entity(Agent, filters=filters,or_filters={"public":True})
 
 
 @api.post("/agents")
@@ -402,7 +404,7 @@ async def get_linked_agents(agent_id: int):
 async def list_workflows(user_id: str):
     """List all workflows for a user"""
     filters = {"user_id": user_id}
-    return list_entity(Workflow, filters=filters)
+    return list_entity(Workflow, filters=filters,or_filters={"public":True})
 
 
 @api.get("/workflows/{workflow_id}")

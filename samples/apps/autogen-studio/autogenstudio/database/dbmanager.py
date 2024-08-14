@@ -91,13 +91,16 @@ class DBManager:
     def _model_to_dict(self, model_obj):
         return {col.name: getattr(model_obj, col.name) for col in model_obj.__table__.columns}
 
+    from sqlalchemy import select, and_, or_
+
     def get_items(
-        self,
-        model_class: SQLModel,
-        session: Session,
-        filters: dict = None,
-        return_json: bool = False,
-        order: str = "desc",
+            self,
+            model_class: SQLModel,
+            session: Session,
+            filters: dict = None,  # AND 查询条件
+            or_filters: dict = None,  # OR 查询条件
+            return_json: bool = False,
+            order: str = "desc",
     ):
         """List all entities"""
         result = []
@@ -105,27 +108,50 @@ class DBManager:
         status_message = ""
 
         try:
+            # Initialize the statement
+            statement = select(model_class)
+
+            # Build the conditions
+            and_conditions = []
+            or_conditions = []
+
+            # Handle filters
             if filters:
-                conditions = [getattr(model_class, col) == value for col, value in filters.items()]
-                statement = select(model_class).where(and_(*conditions))
+                and_conditions = [getattr(model_class, col) == value for col, value in filters.items()]
 
-                if hasattr(model_class, "created_at") and order:
-                    if order == "desc":
-                        statement = statement.order_by(model_class.created_at.desc())
-                    else:
-                        statement = statement.order_by(model_class.created_at.asc())
-            else:
-                statement = select(model_class)
+            # Handle or_filters
+            if or_filters:
+                or_conditions = [getattr(model_class, col) == value for col, value in or_filters.items()]
 
+            # Combine conditions based on the presence of filters and or_filters
+            if and_conditions and or_conditions:
+                # If both conditions are present, use OR between AND groups
+                statement = statement.where(or_(and_(*and_conditions), and_(*or_conditions)))
+            elif and_conditions:
+                # Only AND conditions
+                statement = statement.where(and_(*and_conditions))
+            elif or_conditions:
+                # Only OR conditions
+                statement = statement.where(and_(*or_conditions))
+
+            # Apply ordering if created_at exists
+            if hasattr(model_class, "created_at") and order:
+                if order == "desc":
+                    statement = statement.order_by(model_class.created_at.desc())
+                else:
+                    statement = statement.order_by(model_class.created_at.asc())
+
+            # Execute the statement and retrieve results
             if return_json:
                 result = [self._model_to_dict(row) for row in session.exec(statement).all()]
             else:
                 result = session.exec(statement).all()
+
             status_message = f"{model_class.__name__} Retrieved Successfully"
         except Exception as e:
             session.rollback()
             status = False
-            status_message = f"Error while fetching  {model_class.__name__}"
+            status_message = f"Error while fetching {model_class.__name__}"
             logger.error("Error while getting items: " + str(model_class.__name__) + " " + str(e))
 
         response: Response = Response(
@@ -139,13 +165,14 @@ class DBManager:
         self,
         model_class: SQLModel,
         filters: dict = None,
+            or_filters: dict = None,  # 新增的参数
         return_json: bool = False,
         order: str = "desc",
     ):
         """List all entities"""
 
         with Session(self.engine) as session:
-            response = self.get_items(model_class, session, filters, return_json, order)
+            response = self.get_items(model_class, session, filters, or_filters,return_json, order)
         return response
 
     def delete(self, model_class: SQLModel, filters: dict = None):
