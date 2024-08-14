@@ -158,6 +158,17 @@ const SkillsView = ({}: any) => {
     ];
     if (skill.user_id === user?.email){
       cardItems = [
+          {
+        title: "Edit",
+        icon: PencilSquareIcon,
+        onClick: (e: any) => {
+          e.stopPropagation();
+          setSelectedSkill(skill);
+          setShowSkillModal(true);
+        },
+        hoverText: "Edit",
+      },
+
           ...cardItems,
         {
         title: "Delete",
@@ -165,15 +176,6 @@ const SkillsView = ({}: any) => {
         onClick: (e: any) => {
           e.stopPropagation();
           deleteSkill(skill);
-        },
-        hoverText: "Delete",
-      }, {
-        title: "Edit",
-        icon: PencilSquareIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-          setSelectedSkill(skill);
-          setShowSkillModal(true);
         },
         hoverText: "Delete",
       },

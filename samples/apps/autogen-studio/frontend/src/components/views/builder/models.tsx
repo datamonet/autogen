@@ -146,6 +146,16 @@ const ModelsView = ({}: any) => {
 
   const modelRows = (models || []).map((model: IModelConfig, i: number) => {
     let cardItems = [
+        {
+        title: "Edit",
+        icon: PencilSquareIcon,
+        onClick: (e: any) => {
+          e.stopPropagation();
+                 setSelectedModel(model);
+            setShowModelModal(true);
+        },
+        hoverText: "Edit",
+      },
       {
         title: "Download",
         icon: ArrowDownTrayIcon,
@@ -185,16 +195,7 @@ const ModelsView = ({}: any) => {
         },
         hoverText: "Delete",
       },
-      {
-        title: "Edit",
-        icon: PencilSquareIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-                 setSelectedModel(model);
-            setShowModelModal(true);
-        },
-        hoverText: "Delete",
-      },
+
     ];
 
     return (

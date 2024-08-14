@@ -155,22 +155,24 @@ console.log('selectedAgent',selectedAgent)
 
     ];
     if (agent.user_id === user?.email){
-      cardItems=[...cardItems,
-      {
-        title: "Delete",
-        icon: TrashIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-          deleteAgent(agent);
-        },
-        hoverText: "Delete",
-      },{
+      cardItems=[
+          {
         title: "Edit",
         icon: PencilSquareIcon,
         onClick: (e: any) => {
           e.stopPropagation();
          setSelectedAgent(agent);
             setShowAgentModal(true);
+        },
+        hoverText: "Edit",
+      },
+        ...cardItems,
+      {
+        title: "Delete",
+        icon: TrashIcon,
+        onClick: (e: any) => {
+          e.stopPropagation();
+          deleteAgent(agent);
         },
         hoverText: "Delete",
       },

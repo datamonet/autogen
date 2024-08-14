@@ -169,15 +169,8 @@ const WorkflowView = ({}: any) => {
 
       ];
       if (workflow.user_id===user?.email){
-        cardItems=[...cardItems, {
-          title: "Delete",
-          icon: TrashIcon,
-          onClick: (e: any) => {
-            e.stopPropagation();
-            deleteWorkFlow(workflow);
-          },
-          hoverText: "Delete",
-        },{
+        cardItems=[
+            {
           title: "Edit",
           icon: PencilSquareIcon,
           onClick: (e: any) => {
@@ -186,6 +179,15 @@ const WorkflowView = ({}: any) => {
             setShowWorkflowModal(true);
           },
           hoverText: "Edit",
+        },
+          ...cardItems, {
+          title: "Delete",
+          icon: TrashIcon,
+          onClick: (e: any) => {
+            e.stopPropagation();
+            deleteWorkFlow(workflow);
+          },
+          hoverText: "Delete",
         },]
       }
 
