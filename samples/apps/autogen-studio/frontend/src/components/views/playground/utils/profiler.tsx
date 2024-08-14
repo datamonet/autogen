@@ -84,7 +84,7 @@ const ProfilerView = ({
               {usage.total_cost && usage.total_cost != 0 && (
                 <div className="flex flex-col text-center w-full">
                   <div className="w-full px-2  text-2xl ">
-                    {usage.total_cost?.toFixed(3)}
+                    {usage.total_cost?.toFixed(5)}
                   </div>
                   <div className="w-full text-xs">USD</div>
                 </div>
