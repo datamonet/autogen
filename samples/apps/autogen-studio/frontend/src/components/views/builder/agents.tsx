@@ -3,6 +3,7 @@ import {
   ArrowUpTrayIcon,
   DocumentDuplicateIcon,
   InformationCircleIcon,
+  PencilSquareIcon,
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -115,6 +116,8 @@ const AgentsView = ({}: any) => {
       fetchAgents();
     }
   }, []);
+console.log('newAgent',newAgent , sampleAgent)
+console.log('selectedAgent',selectedAgent)
 
   const agentRows = (agents || []).map((agent: IAgent, i: number) => {
     let cardItems = [
@@ -161,7 +164,17 @@ const AgentsView = ({}: any) => {
           deleteAgent(agent);
         },
         hoverText: "Delete",
-      },]
+      },{
+        title: "Edit",
+        icon: PencilSquareIcon,
+        onClick: (e: any) => {
+          e.stopPropagation();
+         setSelectedAgent(agent);
+            setShowAgentModal(true);
+        },
+        hoverText: "Delete",
+      },
+      ]
     }
     return (
       <li
@@ -171,25 +184,15 @@ const AgentsView = ({}: any) => {
         style={{ width: "200px" }}
       >
         <Card
-          className="h-full p-2 cursor-pointer"
+          className="h-full p-2 "
           title={
             <div className="  ">
               {truncateText(agent.config.name || "", 25)}
             </div>
           }
           onClick={() => {
-             if (agent.user_id !== user?.email) {
-               let newAgent = { ...sanitizeConfig(agent) };
-               newAgent.config.name = `${agent.config.name}_copy`;
-               console.log("newAgent", newAgent);
-               setNewAgent(newAgent);
-               setShowNewAgentModal(true);
-               return
-             }
-
-
-            setSelectedAgent(agent);
-            setShowAgentModal(true);
+            // setSelectedAgent(agent);
+            // setShowAgentModal(true);
           }}
         >
           <div

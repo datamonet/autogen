@@ -7,6 +7,7 @@ import {
   PlusIcon,
   TrashIcon,
   UserGroupIcon,
+    PencilSquareIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { Dropdown, MenuProps, Modal, message } from "antd";
@@ -176,6 +177,15 @@ const WorkflowView = ({}: any) => {
             deleteWorkFlow(workflow);
           },
           hoverText: "Delete",
+        },{
+          title: "Edit",
+          icon: PencilSquareIcon,
+          onClick: (e: any) => {
+            e.stopPropagation();
+            setSelectedWorkflow(workflow);
+            setShowWorkflowModal(true);
+          },
+          hoverText: "Edit",
         },]
       }
 
@@ -186,19 +196,11 @@ const WorkflowView = ({}: any) => {
           style={{ width: "200px" }}
         >
           <Card
-            className="  block p-2 cursor-pointer"
+            className="  block p-2"
             title={<div className="  ">{truncateText(workflow.name, 25)}</div>}
             onClick={() => {
-              if (workflow.user_id !== user?.email) {
-                let newWorkflow = {...sanitizeConfig(workflow)};
-                newWorkflow.name = `${workflow.name}_copy`;
-                setNewWorkflow(newWorkflow);
-                setShowNewWorkflowModal(true);
-                return
-              }
-
-              setSelectedWorkflow(workflow);
-              setShowWorkflowModal(true);
+       // setSelectedWorkflow(workflow);
+       //        setShowWorkflowModal(true);
             }}
           >
             <div

@@ -5,6 +5,7 @@ import {
   CodeBracketSquareIcon,
   DocumentDuplicateIcon,
   InformationCircleIcon,
+    PencilSquareIcon,
   KeyIcon,
   PlusIcon,
   TrashIcon,
@@ -166,6 +167,15 @@ const SkillsView = ({}: any) => {
           deleteSkill(skill);
         },
         hoverText: "Delete",
+      }, {
+        title: "Edit",
+        icon: PencilSquareIcon,
+        onClick: (e: any) => {
+          e.stopPropagation();
+          setSelectedSkill(skill);
+          setShowSkillModal(true);
+        },
+        hoverText: "Delete",
       },
       ]
     }
@@ -174,19 +184,11 @@ const SkillsView = ({}: any) => {
         <div>
           {" "}
           <Card
-            className="h-full p-2 cursor-pointer group"
+            className="h-full p-2 group"
             title={truncateText(skill.name, 25)}
             onClick={() => {
-               if (skill.user_id !== user?.email) {
-                 let newSkill = {...sanitizeConfig(skill)};
-                 newSkill.name = `${skill.name}_copy`;
-                 setNewSkill(newSkill);
-                 setShowNewSkillModal(true);
-                 return
-               }
-
-              setSelectedSkill(skill);
-              setShowSkillModal(true);
+              // setSelectedSkill(skill);
+              // setShowSkillModal(true);
             }}
           >
             <div

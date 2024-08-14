@@ -3,6 +3,7 @@ import {
   ArrowUpTrayIcon,
   DocumentDuplicateIcon,
   InformationCircleIcon,
+  PencilSquareIcon,
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -175,10 +176,7 @@ const ModelsView = ({}: any) => {
         },
         hoverText: "Make a Copy",
       },
-
-    ];
-     if (model.user_id === user?.email) {
-       cardItems = [...cardItems,  {
+      {
         title: "Delete",
         icon: TrashIcon,
         onClick: (e: any) => {
@@ -186,8 +184,19 @@ const ModelsView = ({}: any) => {
           deleteModel(model);
         },
         hoverText: "Delete",
-      },]
-     }
+      },
+      {
+        title: "Edit",
+        icon: PencilSquareIcon,
+        onClick: (e: any) => {
+          e.stopPropagation();
+                 setSelectedModel(model);
+            setShowModelModal(true);
+        },
+        hoverText: "Delete",
+      },
+    ];
+
     return (
       <li
         role="listitem"
@@ -196,21 +205,13 @@ const ModelsView = ({}: any) => {
         style={{ width: "200px" }}
       >
         <Card
-          className="h-full p-2 cursor-pointer"
+          className="h-full p-2"
           title={
             <div className="  ">{truncateText(model.model || "", 20)}</div>
           }
           onClick={() => {
-             if (model.user_id!==user?.email) {
-               let newModel = { ...sanitizeConfig(model) };
-               newModel.model = `${model.model}_copy`;
-               setNewModel(newModel);
-               setShowNewModelModal(true);
-               return
-             }
-
-            setSelectedModel(model);
-            setShowModelModal(true);
+            // setSelectedModel(model);
+            // setShowModelModal(true);
           }}
         >
           <div style={{ minHeight: "65px" }} className="my-2   break-words">
