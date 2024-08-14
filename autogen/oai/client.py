@@ -601,7 +601,6 @@ class OpenAIWrapper:
         return params
 
     def create(self, **config: Any) -> ModelClient.ModelClientResponseProtocol:
-
         """Make a completion for a given config using available clients.
         Besides the kwargs allowed in openai's [or other] client, we allow the following additional kwargs.
         The config in each client will be overridden by the config.
@@ -679,7 +678,6 @@ class OpenAIWrapper:
             actual_usage = None
 
             cache_client = None
-
             if cache is not None:
                 # Use the cache object if provided.
                 cache_client = cache
@@ -723,7 +721,6 @@ class OpenAIWrapper:
                         # check the filter
                         pass_filter = filter_func is None or filter_func(context=context, response=response)
                         if pass_filter or i == last:
-                            print('11111'*100,'this last',total_usage)
                             # Return the response if it passes the filter or it is the last client
                             response.config_id = i
                             response.pass_filter = pass_filter
@@ -791,10 +788,6 @@ class OpenAIWrapper:
                 response.message_retrieval_function = client.message_retrieval
                 # check the filter
                 pass_filter = filter_func is None or filter_func(context=context, response=response)
-                print('----' * 10)
-                print(response.cost)
-                print(response)
-                print('----' * 10)
                 if pass_filter or i == last:
                     # Return the response if it passes the filter or it is the last client
                     response.config_id = i

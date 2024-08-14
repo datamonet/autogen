@@ -38,16 +38,7 @@ const Provider = ({children}: any) => {
     const [darkMode, setDarkMode] = useState(
         storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
     );
-    const [user, setUser] = useState<IUser | null>({
-    "name": "faye",
-    "email": "faye_1225@163.com",
-    "role": 10,
-    "avatar": "https://avatars.githubusercontent.com/u/56664035?v=4",
-    "level": 50,
-    "subscription_credits": 0,
-    "extra_credits": 327.3199999999995,
-    "id": "64a2c22713571ce5bf5d9006"
-});
+    const [user, setUser] = useState<IUser | null>(null);
     const [init, setInit] = useState(false);
     const fetchUser = () => {
         const payLoad = {
