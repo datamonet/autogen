@@ -163,17 +163,17 @@ export const WorkflowViewConfig = ({
             {workflow.id ? "Update Workflow" : "Create Workflow"}
           </Button>
         )}
-        {workflow?.id && (
-          <Button
-            className="ml-2 text-primary"
-            type="primary"
-            onClick={() => {
-              setDrawerOpen(true);
-            }}
-          >
-            Test Workflow
-          </Button>
-        )}
+        {/*{workflow?.id && (*/}
+        {/*  <Button*/}
+        {/*    className="ml-2 text-primary"*/}
+        {/*    type="primary"*/}
+        {/*    onClick={() => {*/}
+        {/*      setDrawerOpen(true);*/}
+        {/*    }}*/}
+        {/*  >*/}
+        {/*    Test Workflow*/}
+        {/*  </Button>*/}
+        {/*)}*/}
         <Button
           className="ml-2"
           key="close  text-primary"
