@@ -118,6 +118,10 @@ class ModelTypes(str, Enum):
     openai = "open_ai"
     google = "google"
     azure = "azure"
+    anthropic = "anthropic"
+    mistral = "mistral"
+    together = "together"
+    groq = "groq"
 
 
 class Model(SQLModel, table=True):
@@ -166,7 +170,6 @@ class AgentConfig(SQLModel, table=False):
     max_round: Optional[int] = 100
     speaker_selection_method: Optional[str] = "auto"
     allow_repeat_speaker: Optional[Union[bool, List["AgentConfig"]]] = True
-
 
 
 class AgentType(str, Enum):

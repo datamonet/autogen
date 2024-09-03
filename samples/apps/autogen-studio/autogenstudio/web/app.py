@@ -64,6 +64,7 @@ def message_handler():
 message_handler_thread = threading.Thread(target=message_handler, daemon=True)
 message_handler_thread.start()
 
+
 app_file_path = os.path.dirname(os.path.abspath(__file__))
 folders = init_app_folders(app_file_path)
 ui_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui")
@@ -85,6 +86,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 
 # allow cross origin requests for testing on localhost:800* ports only
 app.add_middleware(
@@ -262,7 +264,6 @@ async def update_user(item: UpdatePayload):
 async def list_skills(user_id: str):
     """List all skills for a user"""
     filters = {"user_id": user_id}
-
     return list_entity(Skill, filters=filters,or_filters={"public":True})
 
 
@@ -464,6 +465,19 @@ async def link_workflow_agent_sequence(workflow_id: int, agent_id: int, agent_ty
     )
 
 
+@api.post("/workflows/link/agent/{workflow_id}/{agent_id}/{agent_type}/{sequence_id}")
+async def link_workflow_agent_sequence(workflow_id: int, agent_id: int, agent_type: str, sequence_id: int):
+    """Link an agent to a workflow"""
+    print("Sequence ID: ", sequence_id)
+    return dbmanager.link(
+        link_type="workflow_agent",
+        primary_id=workflow_id,
+        secondary_id=agent_id,
+        agent_type=agent_type,
+        sequence_id=sequence_id,
+    )
+
+
 @api.delete("/workflows/link/agent/{workflow_id}/{agent_id}/{agent_type}")
 async def unlink_workflow_agent(workflow_id: int, agent_id: int, agent_type: str):
     """Unlink an agent from a workflow"""
@@ -511,6 +525,25 @@ async def profile_agent_task_run(message_id: int):
         }
     except Exception as ex_error:
         print(traceback.format_exc())
+        return {
+            "status": False,
+            "message": "Error occurred while profiling agent task run: " + str(ex_error),
+        }
+
+
+@api.get("/profiler/{message_id}")
+async def profile_agent_task_run(message_id: int):
+    """Profile an agent task run"""
+    try:
+        agent_message = dbmanager.get(Message, filters={"id": message_id}).data[0]
+
+        profile = profiler.profile(agent_message)
+        return {
+            "status": True,
+            "message": "Agent task run profiled successfully",
+            "data": profile,
+        }
+    except Exception as ex_error:
         return {
             "status": False,
             "message": "Error occurred while profiling agent task run: " + str(ex_error),
@@ -573,7 +606,6 @@ async def run_session_workflow(message: Message, session_id: int, workflow_id: i
         response: Response = dbmanager.upsert(agent_response)
         return response.model_dump(mode="json")
     except Exception as ex_error:
-        print(traceback.format_exc())
         return {
             "status": False,
             "message": "Error occurred while processing message: " + str(ex_error),
