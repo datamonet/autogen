@@ -123,8 +123,6 @@ const WorkflowView = ({}: any) => {
 
   const [showExportModal, setShowExportModal] = React.useState(false);
 
-  const [showExportModal, setShowExportModal] = React.useState(false);
-
   const workflowRows = (workflows || []).map(
     (workflow: IWorkflow, i: number) => {
       let cardItems = [
