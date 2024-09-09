@@ -292,17 +292,18 @@ export const AgentConfigView = ({
                 <ControlRowView
                   title="Code Execution Config"
                   className="mt-4"
-                  description="Determines if and where code execution is done."
-                  value={agent.config.code_execution_config || "none"}
+                  description="Whether to execute the code execution code or not."
+                  value={""}
+                  // value={agent.config.code_execution_config || "none"}
                   control={
                     <Switch
                         className="mt-2"
                         onChange={(value: boolean) => {
-                        onControlChange(value?'docker':'none', "code_execution_config");
+                        onControlChange(value ? 'docker' : 'none', "code_execution_config");
                       }}
                         checkedChildren={<CheckIcon className="w-3 h-3 mt-1 ml-1" />}
-                        unCheckedChildren={<XMarkIcon className="w-3 h-3 mt-1 ml-1" />}
-                        defaultChecked
+                        unCheckedChildren={<XMarkIcon className="w-3 h-3 mt-0.5 ml-1" />}
+                        defaultChecked={(agent.config.code_execution_config || "none") === 'docker'}
                     />
                     // <Select
                     //   className="mt-2 w-full"

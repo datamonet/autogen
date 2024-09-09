@@ -64,7 +64,6 @@ def message_handler():
 message_handler_thread = threading.Thread(target=message_handler, daemon=True)
 message_handler_thread.start()
 
-
 app_file_path = os.path.dirname(os.path.abspath(__file__))
 folders = init_app_folders(app_file_path)
 ui_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui")
@@ -86,7 +85,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
 
 # allow cross origin requests for testing on localhost:800* ports only
 app.add_middleware(
@@ -148,7 +146,7 @@ def list_entity(
         order: str = "desc",
 ):
     """List all entities for a user"""
-    return dbmanager.get(model_class, filters=filters, or_filters=or_filters,return_json=return_json, order=order)
+    return dbmanager.get(model_class, filters=filters, or_filters=or_filters, return_json=return_json, order=order)
 
 
 def delete_entity(model_class: Any, filters: dict = None):
@@ -167,10 +165,10 @@ async def get_user(request: Request):
         user = db["users"].find_one({"email": payload.get("email")})
         if user:
             user["id"] = str(user.pop("_id"))
-        return  {
-                "status": True,
-                "data": user
-            }
+        return {
+            "status": True,
+            "data": user
+        }
 
     except Exception as ex_error:
         return {
@@ -184,9 +182,9 @@ async def logout(response: FastAPIResponse):
     try:
         response.delete_cookie(key=cookie_name, path="/", domain=".takin.ai", secure=True, httponly=True)
         return {
-                "status": True,
-                "message": "Cookie deleted",
-            }
+            "status": True,
+            "message": "Cookie deleted",
+        }
     except Exception as ex_error:
         return {
             "status": False,
@@ -220,6 +218,9 @@ async def update_user(item: UpdatePayload):
         # 计算总费用
         total_usd = sum(item.get("total_cost", 0) for item in profile.get("usage", []))
         cost = total_usd * 100 * 1.5
+        # 计算 ecb_run_count，默认运行一次e2b就收费0.1积分
+        ecb_run_count = sum(1 for entry in profile['profile'] if entry.get('code_execution', {}).get('is_code') is True)
+        cost += ecb_run_count * 0.1
 
         # 保证最低消费为0.01
         total_cost = max(round(cost, 2), 0.01)
@@ -264,7 +265,7 @@ async def update_user(item: UpdatePayload):
 async def list_skills(user_id: str):
     """List all skills for a user"""
     filters = {"user_id": user_id}
-    return list_entity(Skill, filters=filters,or_filters={"public":True})
+    return list_entity(Skill, filters=filters, or_filters={"public": True})
 
 
 @api.post("/skills")
@@ -323,7 +324,7 @@ async def delete_model(model_id: int, user_id: str):
 async def list_agents(user_id: str):
     """List all agents for a user"""
     filters = {"user_id": user_id}
-    return list_entity(Agent, filters=filters,or_filters={"public":True})
+    return list_entity(Agent, filters=filters, or_filters={"public": True})
 
 
 @api.post("/agents")
@@ -405,7 +406,7 @@ async def get_linked_agents(agent_id: int):
 async def list_workflows(user_id: str):
     """List all workflows for a user"""
     filters = {"user_id": user_id}
-    return list_entity(Workflow, filters=filters,or_filters={"public":True})
+    return list_entity(Workflow, filters=filters, or_filters={"public": True})
 
 
 @api.get("/workflows/{workflow_id}")
