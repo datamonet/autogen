@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Tuple, Union
 from dotenv import load_dotenv
 from loguru import logger
 
-from autogen.coding import DockerCommandLineCodeExecutor, LocalCommandLineCodeExecutor
+from autogen.coding import DockerCommandLineCodeExecutor,E2BCommandlineCodeExecutor, LocalCommandLineCodeExecutor
 from autogen.oai.client import ModelClient, OpenAIWrapper
 
 from ..datamodel import CodeExecutionConfigTypes, Model, Skill
@@ -474,11 +474,13 @@ def load_code_execution_config(code_execution_type: CodeExecutionConfigTypes, wo
     if code_execution_type == CodeExecutionConfigTypes.local:
         executor = LocalCommandLineCodeExecutor(work_dir=work_dir)
     elif code_execution_type == CodeExecutionConfigTypes.docker:
-        try:
-            executor = DockerCommandLineCodeExecutor(work_dir=work_dir)
-        except Exception as e:
-            logger.error(f"Error initializing Docker executor: {e}")
-            return False
+        executor = E2BCommandlineCodeExecutor(bind_dir=work_dir)
+        # takin command:这样改动最小
+        # try:
+        #     executor = DockerCommandLineCodeExecutor(work_dir=work_dir)
+        # except Exception as e:
+        #     logger.error(f"Error initializing Docker executor: {e}")
+        #     return False
     elif code_execution_type == CodeExecutionConfigTypes.none:
         return False
     else:

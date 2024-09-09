@@ -21,7 +21,6 @@ classifiers = [
 dependencies = [
     "PyJWT",
     "pymongo",
-
     "pydantic",
     "fastapi",
     "typer",

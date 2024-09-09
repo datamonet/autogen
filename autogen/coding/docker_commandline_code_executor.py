@@ -126,6 +126,7 @@ class DockerCommandLineCodeExecutor(CodeExecutor):
             entrypoint="/bin/sh",
             tty=True,
             auto_remove=auto_remove,
+            # 绑定了
             volumes={str(bind_dir.resolve()): {"bind": "/workspace", "mode": "rw"}},
             working_dir="/workspace",
         )

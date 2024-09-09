@@ -56,6 +56,7 @@ class AutoGenChatManager:
         """
 
         # create a working director for workflow based on user_dir/session_id/time_hash
+        # takin command:生成了最开始的代码保存目录
         work_dir = os.path.join(
             user_dir,
             str(message.session_id),
