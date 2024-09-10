@@ -10,7 +10,8 @@ from typing import Any, Dict, List, Tuple, Union
 from dotenv import load_dotenv
 from loguru import logger
 
-from autogen.coding import DockerCommandLineCodeExecutor,E2BCommandlineCodeExecutor, LocalCommandLineCodeExecutor
+from autogen.coding import DockerCommandLineCodeExecutor, LocalCommandLineCodeExecutor
+from .e2b_commandline_code_executor import E2BCommandlineCodeExecutor
 from autogen.oai.client import ModelClient, OpenAIWrapper
 
 from ..datamodel import CodeExecutionConfigTypes, Model, Skill
