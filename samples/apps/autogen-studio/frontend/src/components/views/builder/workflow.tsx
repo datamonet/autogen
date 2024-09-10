@@ -137,16 +137,6 @@ const WorkflowView = ({}: any) => {
           hoverText: "Export",
         },
         {
-          title: "Export",
-          icon: CodeBracketSquareIcon,
-          onClick: (e: any) => {
-            e.stopPropagation();
-            setSelectedExportWorkflow(workflow);
-            setShowExportModal(true);
-          },
-          hoverText: "Export",
-        },
-        {
           title: "Download",
           icon: ArrowDownTrayIcon,
           onClick: (e: any) => {
