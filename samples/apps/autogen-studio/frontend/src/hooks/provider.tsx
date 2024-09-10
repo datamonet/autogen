@@ -38,12 +38,7 @@ const Provider = ({children}: any) => {
     const [darkMode, setDarkMode] = useState(
         storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
     );
-    const [user, setUser] = useState<IUser | null>( {
-    id: '64dded6dde1ff3bc8b6d4488',
-    name: "curator@takin.ai",
-    email: 'curator@takin.ai',
-    role: 50,
-    subscription_credits:2000,})
+    const [user, setUser] = useState<IUser | null>(null);
     const [init, setInit] = useState(false);
     const fetchUser = () => {
         const payLoad = {
@@ -105,10 +100,10 @@ const Provider = ({children}: any) => {
         setLocalStorage("darkmode", darkMode, false);
     };
 
-    // useMemo(() => {
-    //     // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
-    //     fetchUser()
-    // }, [])
+    useMemo(() => {
+        // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
+        fetchUser()
+    }, [])
 
     return (
         <appContext.Provider
@@ -120,7 +115,12 @@ const Provider = ({children}: any) => {
                 setDarkMode: updateDarkMode,
             }}
         >
-            {children
+            {init ? children :
+                <div className="w-full text-center py-20 flex flex-col space-y-4">
+                    <BounceLoader className="bg-gray-900"/>
+                    <p className="inline-block">loading ..</p>
+
+                </div>
             }
         </appContext.Provider>
     );
