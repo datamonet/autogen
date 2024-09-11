@@ -14,6 +14,12 @@ from e2b import Sandbox
 from .base import CodeBlock, CodeExecutor, CodeExtractor, CommandLineCodeResult
 from .markdown_code_extractor import MarkdownCodeExtractor
 
+
+
+#  非最新代码，最新代码在 autogen/samples/apps/autogen-studio/autogenstudio/utils/e2b_commandline_code_executor.py
+#  非最新代码，最新代码在 autogen/samples/apps/autogen-studio/autogenstudio/utils/e2b_commandline_code_executor.py
+#  非最新代码，最新代码在 autogen/samples/apps/autogen-studio/autogenstudio/utils/e2b_commandline_code_executor.py
+#  非最新代码，最新代码在 autogen/samples/apps/autogen-studio/autogenstudio/utils/e2b_commandline_code_executor.py
 logger = logging.getLogger(__name__)
 
 __all__ = ("E2BCommandlineCodeExecutor",)
@@ -54,6 +60,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
     def __init__(self, sandbox_template: str = "base",
                  bind_dir: Optional[Union[Path, str]] = None, ):
         """初始化 e2b 沙盒执行器。
+        非最新代码，最新代码在 autogen/samples/apps/autogen-studio/autogenstudio/utils/e2b_commandline_code_executor.py
 
         Args:
             sandbox_template (str): 沙盒模板名，默认为 "base"。

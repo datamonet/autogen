@@ -1,3 +1,4 @@
+import os
 import re
 import logging
 from hashlib import md5
@@ -25,7 +26,8 @@ filename_patterns = [
     re.compile(r"^# (filename:)?(.+?)$", re.DOTALL),
 ]
 
-def _get_file_name_from_content(code: str,lang:str) -> str :
+
+def _get_file_name_from_content(code: str, lang: str) -> str:
     """
     根据code获取文件名，如果没有文件名，就随机生成一个
     """
@@ -35,7 +37,9 @@ def _get_file_name_from_content(code: str,lang:str) -> str :
         matches = pattern.match(first_line)
         if matches is not None:
             return matches.group(2).strip()
-    return  f"tmp_code_{md5(code.encode()).hexdigest()}.{lang}"
+    return f"tmp_code_{md5(code.encode()).hexdigest()}.{lang}"
+
+
 class E2BCommandlineCodeExecutor(CodeExecutor):
     DEFAULT_EXECUTION_POLICY: ClassVar[Dict[str, bool]] = {
         "bash": True,
@@ -65,7 +69,8 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         self.sandbox_template = sandbox_template
         # 此时沙盒默认的工作目录是/home/user
         self._sandbox = Sandbox(template=sandbox_template,
-                                on_stdout=lambda output: logger.info(">>>> e2b sandbox:", output.line) )
+                                env_vars={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")},
+                                on_stdout=lambda output: logger.info(">>>> e2b sandbox:", output.line))
         self._work_dir = Path('/home/user')
         self._bind_dir = bind_dir
         self._code_extractor = None  # 延迟加载的代码提取器
@@ -78,10 +83,10 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             # 如果文件名以 . 开头，则跳过
             if filename.startswith('.') or fileInfo.is_dir:
                 continue
-            sandbox_path = str(self._work_dir/filename)
+            sandbox_path = str(self._work_dir / filename)
             file_in_bytes = self._sandbox.download_file(sandbox_path)
 
-            autogen_code_path =self._bind_dir / filename
+            autogen_code_path = self._bind_dir / filename
             with autogen_code_path.open("wb") as f:
                 f.write(file_in_bytes)
             files.extend([autogen_code_path])
@@ -139,7 +144,6 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         files = self.sandbox_download_file()
         code_file = str(files[0]) if files else None
         return CommandLineCodeResult(exit_code=last_exit_code, output="".join(outputs), code_file=code_file)
-
 
     def stop(self) -> None:
         """(Experimental) Stop the code executor."""
