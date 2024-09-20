@@ -7,7 +7,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { Dropdown, MenuProps, Modal, message } from "antd";
+import { Dropdown, MenuProps, Modal, message, Tabs } from "antd";
 import * as React from "react";
 import { IAgent, IStatus } from "../../types";
 import { appContext } from "../../../hooks/provider";
@@ -20,7 +20,7 @@ import {
 } from "../../utils";
 import { BounceLoader, Card, CardHoverBar, LoadingOverlay } from "../../atoms";
 import { AgentViewer } from "./utils/agentconfig";
-
+import type { TabsProps } from "antd";
 const AgentsView = ({}: any) => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<IStatus | null>({
@@ -116,106 +116,133 @@ const AgentsView = ({}: any) => {
       fetchAgents();
     }
   }, []);
-console.log('newAgent',newAgent , sampleAgent)
-console.log('selectedAgent',selectedAgent)
 
-  const agentRows = (agents || []).map((agent: IAgent, i: number) => {
-    let cardItems = [
-      {
-        title: "Download",
-        icon: ArrowDownTrayIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-          // download workflow as workflow.name.json
-          const element = document.createElement("a");
-          const sanitizedAgent = sanitizeConfig(agent);
-          const file = new Blob([JSON.stringify(sanitizedAgent)], {
-            type: "application/json",
-          });
-          element.href = URL.createObjectURL(file);
-          element.download = `agent_${agent.config.name}.json`;
-          document.body.appendChild(element); // Required for this to work in FireFox
-          element.click();
+  const agentRows = (agents: IAgent[]) => {
+    return agents.map((agent: IAgent, i: number) => {
+      let cardItems = [
+        {
+          title: "Download",
+          icon: ArrowDownTrayIcon,
+          onClick: (e: any) => {
+            e.stopPropagation();
+            // download workflow as workflow.name.json
+            const element = document.createElement("a");
+            const sanitizedAgent = sanitizeConfig(agent);
+            const file = new Blob([JSON.stringify(sanitizedAgent)], {
+              type: "application/json",
+            });
+            element.href = URL.createObjectURL(file);
+            element.download = `agent_${agent.config.name}.json`;
+            document.body.appendChild(element); // Required for this to work in FireFox
+            element.click();
+          },
+          hoverText: "Download",
         },
-        hoverText: "Download",
-      },
-      {
-        title: "Make a Copy",
-        icon: DocumentDuplicateIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-          let newAgent = { ...sanitizeConfig(agent) };
-          newAgent.config.name = `${agent.config.name}_copy`;
-          console.log("newAgent", newAgent);
-          setNewAgent(newAgent);
-          setShowNewAgentModal(true);
+        {
+          title: "Make a Copy",
+          icon: DocumentDuplicateIcon,
+          onClick: (e: any) => {
+            e.stopPropagation();
+            let newAgent = { ...sanitizeConfig(agent) };
+            newAgent.config.name = `${agent.config.name}_copy`;
+            console.log("newAgent", newAgent);
+            setNewAgent(newAgent);
+            setShowNewAgentModal(true);
+          },
+          hoverText: "Make a Copy",
         },
-        hoverText: "Make a Copy",
-      },
-
-    ];
-    if (agent.user_id === user?.email){
-      cardItems=[
+      ];
+      if (agent.user_id === user?.email) {
+        cardItems = [
           {
-        title: "Edit",
-        icon: PencilSquareIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-         setSelectedAgent(agent);
-            setShowAgentModal(true);
-        },
-        hoverText: "Edit",
-      },
-        ...cardItems,
-      {
-        title: "Delete",
-        icon: TrashIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-          deleteAgent(agent);
-        },
-        hoverText: "Delete",
-      },
-      ]
-    }
-    return (
-      <li
-        role="listitem"
-        key={"agentrow" + i}
-        className=" "
-        style={{ width: "200px" }}
-      >
-        <Card
-          className="h-full p-2 "
-          title={
-            <div className="  ">
-              {truncateText(agent.config.name || "", 25)}
-            </div>
-          }
-          onClick={() => {
-            // setSelectedAgent(agent);
-            // setShowAgentModal(true);
-          }}
+            title: "Edit",
+            icon: PencilSquareIcon,
+            onClick: (e: any) => {
+              e.stopPropagation();
+              setSelectedAgent(agent);
+              setShowAgentModal(true);
+            },
+            hoverText: "Edit",
+          },
+          ...cardItems,
+          {
+            title: "Delete",
+            icon: TrashIcon,
+            onClick: (e: any) => {
+              e.stopPropagation();
+              deleteAgent(agent);
+            },
+            hoverText: "Delete",
+          },
+        ];
+      }
+      return (
+        <li
+          role="listitem"
+          key={"agentrow" + i}
+          className=" "
+          style={{ width: "200px" }}
         >
-          <div
-            style={{ minHeight: "65px" }}
-            aria-hidden="true"
-            className="my-2   break-words"
+          <Card
+            className="h-full p-2 "
+            title={
+              <div className="  ">
+                {truncateText(agent.config.name || "", 25)}
+              </div>
+            }
+            onClick={() => {
+              // setSelectedAgent(agent);
+              // setShowAgentModal(true);
+            }}
           >
-            <div className="text-xs mb-2">{agent.type}</div>{" "}
-            {truncateText(agent.config.description || "", 70)}
-          </div>
-          <div
-            aria-label={`Updated ${timeAgo(agent.updated_at || "")}`}
-            className="text-xs"
-          >
-            {timeAgo(agent.updated_at || "")}
-          </div>
-          <CardHoverBar items={cardItems} />
-        </Card>
-      </li>
-    );
-  });
+            <div
+              style={{ minHeight: "65px" }}
+              aria-hidden="true"
+              className="my-2   break-words"
+            >
+              <div className="text-xs mb-2">{agent.type}</div>{" "}
+              {truncateText(agent.config.description || "", 70)}
+            </div>
+            <div
+              aria-label={`Updated ${timeAgo(agent.updated_at || "")}`}
+              className="text-xs"
+            >
+              {timeAgo(agent.updated_at || "")}
+            </div>
+            <CardHoverBar items={cardItems} />
+          </Card>
+        </li>
+      );
+    });
+  };
+
+  const items: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "All",
+      children: <ul className="flex flex-wrap gap-3"> {agentRows(agents!)}</ul>,
+    },
+    {
+      key: "2",
+      label: "Community",
+      children: (
+        <ul className="flex flex-wrap gap-3">
+          {" "}
+          {agentRows(agents!.filter((agent) => agent.user_id !== user?.email))}
+        </ul>
+      ),
+    },
+    {
+      key: "3",
+      label: "My",
+      children: (
+        <ul className="flex flex-wrap gap-3">
+          {" "}
+          {agentRows(agents!.filter((agent) => agent.user_id === user?.email))}
+        </ul>
+      ),
+    },
+  ];
 
   const AgentModal = ({
     agent,
@@ -340,12 +367,12 @@ console.log('selectedAgent',selectedAgent)
         }}
       />
 
-      <div className="mb-2   relative">
-        <div className="     rounded  ">
+      <div className="mb-2 relative">
+        <div className="rounded">
           <div className="flex mt-2 pb-2 mb-2 border-b">
             <div className="flex-1 font-semibold mb-2 ">
               {" "}
-              Agents ({agentRows.length}){" "}
+              Agents ({agents ? agentRows(agents!).length : 0}){" "}
             </div>
             <div>
               <Dropdown.Button
@@ -374,10 +401,11 @@ console.log('selectedAgent',selectedAgent)
               GroupChat) which can have multiple agents in it.
             </div>
           </div>
+
           {agents && agents.length > 0 && (
             <div className="w-full  relative">
               <LoadingOverlay loading={loading} />
-              <ul className="   flex flex-wrap gap-3">{agentRows}</ul>
+              <Tabs defaultActiveKey="1" items={items} />
             </div>
           )}
 

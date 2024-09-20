@@ -10,14 +10,14 @@ import {
   Tabs,
   message,
   theme,
-    Switch //takin
+  Switch, //takin
 } from "antd";
 import {
   BugAntIcon,
   CpuChipIcon,
   UserGroupIcon,
-    CheckIcon,
-    XMarkIcon
+  CheckIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { appContext } from "../../../../hooks/provider";
 import {
@@ -49,11 +49,11 @@ export const AgentConfigView = ({
   const [controlChanged, setControlChanged] = React.useState<boolean>(false);
 
   const onControlChange = (value: any, key: string) => {
-    // if (key === "llm_config") {
-    //   if (value.config_list.length === 0) {
-    //     value = false;
-    //   }
-    // }
+    if (key === "public") {
+      setAgent({ ...agent, public: value });
+      setControlChanged(true);
+      return;
+    }
     const updatedAgent = {
       ...agent,
       config: { ...agent.config, [key]: value },
@@ -220,6 +220,24 @@ export const AgentConfigView = ({
                 />
               }
             />
+            <ControlRowView
+              title="Public Status"
+              description="Defines the method to summarize the conversation"
+              value={agent.public ? "Public" : "Private"}
+              control={
+                <Switch
+                  className="mt-2"
+                  onChange={(value: boolean) => {
+                    onControlChange(value, "public");
+                  }}
+                  checkedChildren={<CheckIcon className="w-3 h-3 mt-1 ml-1" />}
+                  unCheckedChildren={
+                    <XMarkIcon className="w-3 h-3 mt-0.5 ml-1" />
+                  }
+                  defaultChecked={agent.public}
+                />
+              }
+            />
 
             <div className="mt-4">
               {" "}
@@ -297,13 +315,23 @@ export const AgentConfigView = ({
                   // value={agent.config.code_execution_config || "none"}
                   control={
                     <Switch
-                        className="mt-2"
-                        onChange={(value: boolean) => {
-                        onControlChange(value ? 'docker' : 'none', "code_execution_config");
+                      className="mt-2"
+                      onChange={(value: boolean) => {
+                        onControlChange(
+                          value ? "docker" : "none",
+                          "code_execution_config"
+                        );
                       }}
-                        checkedChildren={<CheckIcon className="w-3 h-3 mt-1 ml-1" />}
-                        unCheckedChildren={<XMarkIcon className="w-3 h-3 mt-0.5 ml-1" />}
-                        defaultChecked={(agent.config.code_execution_config || "none") === 'docker'}
+                      checkedChildren={
+                        <CheckIcon className="w-3 h-3 mt-1 ml-1" />
+                      }
+                      unCheckedChildren={
+                        <XMarkIcon className="w-3 h-3 mt-0.5 ml-1" />
+                      }
+                      defaultChecked={
+                        (agent.config.code_execution_config || "none") ===
+                        "docker"
+                      }
                     />
                     // <Select
                     //   className="mt-2 w-full"

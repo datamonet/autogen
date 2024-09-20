@@ -60,6 +60,7 @@ export interface IAgent {
   id?: number;
   skills?: Array<ISkill>;
   user_id?: string;
+  public?:boolean;
 }
 
 export interface IWorkflow {
@@ -73,6 +74,7 @@ export interface IWorkflow {
   summary_method?: "none" | "last" | "llm";
   id?: number;
   user_id?: string;
+  public?: boolean;
 }
 
 export interface IModelConfig {

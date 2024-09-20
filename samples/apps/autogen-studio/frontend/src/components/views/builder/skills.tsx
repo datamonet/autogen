@@ -5,7 +5,7 @@ import {
   CodeBracketSquareIcon,
   DocumentDuplicateIcon,
   InformationCircleIcon,
-    PencilSquareIcon,
+  PencilSquareIcon,
   KeyIcon,
   PlusIcon,
   TrashIcon,
@@ -40,6 +40,7 @@ const SkillsView = ({}: any) => {
   });
 
   const { user } = React.useContext(appContext);
+  const isAdmin = (user?.role || 10) >= 50;
   const serverUrl = getServerUrl();
   const listSkillsUrl = `${serverUrl}/skills?user_id=${user?.email}`;
   const saveSkillsUrl = `${serverUrl}/skills`;
@@ -154,32 +155,31 @@ const SkillsView = ({}: any) => {
         },
         hoverText: "Make a Copy",
       },
-
     ];
-    if (skill.user_id === user?.email){
+    if (skill.user_id === user?.email) {
       cardItems = [
-          {
-        title: "Edit",
-        icon: PencilSquareIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-          setSelectedSkill(skill);
-          setShowSkillModal(true);
-        },
-        hoverText: "Edit",
-      },
-
-          ...cardItems,
         {
-        title: "Delete",
-        icon: TrashIcon,
-        onClick: (e: any) => {
-          e.stopPropagation();
-          deleteSkill(skill);
+          title: "Edit",
+          icon: PencilSquareIcon,
+          onClick: (e: any) => {
+            e.stopPropagation();
+            setSelectedSkill(skill);
+            setShowSkillModal(true);
+          },
+          hoverText: "Edit",
         },
-        hoverText: "Delete",
-      },
-      ]
+
+        ...cardItems,
+        {
+          title: "Delete",
+          icon: TrashIcon,
+          onClick: (e: any) => {
+            e.stopPropagation();
+            deleteSkill(skill);
+          },
+          hoverText: "Delete",
+        },
+      ];
     }
     return (
       <li key={"skillrow" + i} className=" " style={{ width: "200px" }}>
@@ -344,23 +344,26 @@ const SkillsView = ({}: any) => {
               {" "}
               Skills ({skillRows.length}){" "}
             </ul>
-            <div>
-              <Dropdown.Button
-                type="primary"
-                menu={{
-                  items: skillsMenuItems,
-                  onClick: skillsMenuItemOnClick,
-                }}
-                placement="bottomRight"
-                trigger={["click"]}
-                onClick={() => {
-                  setShowNewSkillModal(true);
-                }}
-              >
-                <PlusIcon className="w-5 h-5 inline-block mr-1" />
-                New Skill
-              </Dropdown.Button>
-            </div>
+
+            {isAdmin && (
+              <div>
+                <Dropdown.Button
+                  type="primary"
+                  menu={{
+                    items: skillsMenuItems,
+                    onClick: skillsMenuItemOnClick,
+                  }}
+                  placement="bottomRight"
+                  trigger={["click"]}
+                  onClick={() => {
+                    setShowNewSkillModal(true);
+                  }}
+                >
+                  <PlusIcon className="w-5 h-5 inline-block mr-1" />
+                  New Skill
+                </Dropdown.Button>
+              </div>
+            )}
           </div>
           <div className="text-xs mb-2 pb-1  ">
             {" "}

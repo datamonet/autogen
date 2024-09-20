@@ -1,129 +1,130 @@
-import React, {useState, useMemo} from "react";
-import {navigate} from "@reach/router"
+import React, { useState, useMemo } from "react";
+import { navigate } from "@reach/router";
 import {
-    fetchJSON,
-    getLocalStorage,
-    setLocalStorage, getServerUrl,
+  fetchJSON,
+  getLocalStorage,
+  setLocalStorage,
+  getServerUrl,
 } from "../components/utils";
-import {BounceLoader} from "../components/atoms";
+import { BounceLoader } from "../components/atoms";
 
 export interface IUser {
-    id: string;
-    name: string;
-    email?: string;
-    avatar?: string;
-    role: number;
-    level?: number
-    extra_credits?: number
-    subscription_credits?: number
+  id: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+  role: number;
+  level?: number;
+  extra_credits?: number;
+  subscription_credits?: number;
 }
 
 export interface AppContextType {
-    user: IUser | null;
-    setUser: any;
-    logout: any;
-    darkMode: string;
-    setDarkMode: any;
+  user: IUser | null;
+  setUser: any;
+  logout: any;
+  darkMode: string;
+  setDarkMode: any;
 }
 
 // TODO:修改callback
-const signUrl = 'https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fautogen.takin.ai';
+const signUrl =
+  "https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fautogen.takin.ai";
 
 export const appContext = React.createContext<AppContextType>(
-    {} as AppContextType
+  {} as AppContextType
 );
-const Provider = ({children}: any) => {
-    const serverUrl = getServerUrl();
-    const storedValue = getLocalStorage("darkmode", false);
-    const [darkMode, setDarkMode] = useState(
-        storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
-    );
-    const [user, setUser] = useState<IUser | null>(null);
-    const [init, setInit] = useState(false);
-    const fetchUser = () => {
-        const payLoad = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include"
-        };
-
-        const onSuccess = (data: any) => {
-            if (data && !data['status']) {
-                setUser(null);
-                setLocalStorage("user_info", null);
-                navigate(signUrl);
-                return;
-            }
-            const userInfo = getLocalStorage("user_info");
-            if (userInfo !== null) {
-                setUser(userInfo);
-                setInit(true);
-                return;
-            }
-            setUser(data.data)
-            setLocalStorage("user_info", data.data);
-            setInit(true);
-        };
-        const onError = (err: any) => {
-            navigate(signUrl)
-        };
-        fetchJSON(`${serverUrl}/login`, payLoad, onSuccess, onError);
+const Provider = ({ children }: any) => {
+  const serverUrl = getServerUrl();
+  const storedValue = getLocalStorage("darkmode", false);
+  const [darkMode, setDarkMode] = useState(
+    storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
+  );
+  const [user, setUser] = useState<IUser | null>(null);
+  const [init, setInit] = useState(false);
+  const fetchUser = () => {
+    const payLoad = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
     };
 
+    const onSuccess = (data: any) => {
+      if (data && !data["status"]) {
+        setUser(null);
+        setLocalStorage("user_info", null);
+        navigate(signUrl);
+        return;
+      }
+      const userInfo = getLocalStorage("user_info");
+      if (userInfo !== null) {
+        setUser(userInfo);
+        setInit(true);
+        return;
+      }
+      setUser(data.data);
+      setLocalStorage("user_info", data.data);
+      setInit(true);
+    };
+    const onError = (err: any) => {
+      navigate(signUrl);
+    };
+    fetchJSON(`${serverUrl}/login`, payLoad, onSuccess, onError);
+  };
 
-    const logout = () => {
-        const payLoad = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include"
-        };
-
-        const onSuccess = (data: any) => {
-            if (data && !data['status']) return
-            setUser(null);
-            setLocalStorage("user_info", null);
-            navigate(signUrl)
-        };
-        const onError = (err: any) => {
-            navigate(signUrl)
-        };
-        fetchJSON(`${serverUrl}/logout`, payLoad, onSuccess, onError);
-
+  const logout = () => {
+    const payLoad = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
     };
 
-    const updateDarkMode = (darkMode: string) => {
-        setDarkMode(darkMode);
-        setLocalStorage("darkmode", darkMode, false);
+    const onSuccess = (data: any) => {
+      if (data && !data["status"]) return;
+      setUser(null);
+      setLocalStorage("user_info", null);
+      navigate(signUrl);
     };
+    const onError = (err: any) => {
+      navigate(signUrl);
+    };
+    fetchJSON(`${serverUrl}/logout`, payLoad, onSuccess, onError);
+  };
 
-    useMemo(() => {
-        // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
-        fetchUser()
-    }, [])
+  const updateDarkMode = (darkMode: string) => {
+    setDarkMode(darkMode);
+    setLocalStorage("darkmode", darkMode, false);
+  };
 
-    return (
-        <appContext.Provider
-            value={{
-                user,
-                setUser,
-                logout,
-                darkMode,
-                setDarkMode: updateDarkMode,
-            }}
-        >
-            {init ? children :
-                <div className="w-full text-center py-20 flex flex-col space-y-4">
-                    <BounceLoader className="bg-gray-900"/>
-                    <p className="inline-block">loading ..</p>
+  useMemo(() => {
+    // 检查浏览器中是否有cookie，如果没有则跳转登录页面；如果有就进行解析
+    fetchUser();
+  }, []);
 
-                </div>
-            }
-        </appContext.Provider>
-    );
+  return (
+    <appContext.Provider
+      value={{
+        user,
+        setUser,
+        logout,
+        darkMode,
+        setDarkMode: updateDarkMode,
+      }}
+    >
+      {init ? (
+        children
+      ) : (
+        <div className="w-full text-center py-20 flex flex-col space-y-4">
+          <BounceLoader className="bg-gray-900" />
+          <p className="inline-block">loading ..</p>
+        </div>
+      )}
+    </appContext.Provider>
+  );
 };
 
-export default ({element}: any) => <Provider>{element}</Provider>;
+export default ({ element }: any) => <Provider>{element}</Provider>;

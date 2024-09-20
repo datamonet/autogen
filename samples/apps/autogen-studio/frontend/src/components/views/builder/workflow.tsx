@@ -7,10 +7,10 @@ import {
   PlusIcon,
   TrashIcon,
   UserGroupIcon,
-    PencilSquareIcon,
+  PencilSquareIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
-import { Dropdown, MenuProps, Modal, message } from "antd";
+import { Dropdown, MenuProps, Modal, message, Tabs } from "antd";
 import * as React from "react";
 import { IWorkflow, IStatus } from "../../types";
 import { appContext } from "../../../hooks/provider";
@@ -24,7 +24,7 @@ import {
 import { BounceLoader, Card, CardHoverBar, LoadingOverlay } from "../../atoms";
 import { WorflowViewer } from "./utils/workflowconfig";
 import { ExportWorkflowModal } from "./utils/export";
-
+import type { TabsProps } from "antd";
 const WorkflowView = ({}: any) => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<IStatus | null>({
@@ -120,11 +120,10 @@ const WorkflowView = ({}: any) => {
     }
   }, []);
 
-
   const [showExportModal, setShowExportModal] = React.useState(false);
 
-  const workflowRows = (workflows || []).map(
-    (workflow: IWorkflow, i: number) => {
+  const workflowRows = (workflows: IWorkflow[]) => {
+    return workflows.map((workflow: IWorkflow, i: number) => {
       let cardItems = [
         {
           title: "Export",
@@ -166,29 +165,30 @@ const WorkflowView = ({}: any) => {
           },
           hoverText: "Make a Copy",
         },
-
       ];
-      if (workflow.user_id===user?.email){
-        cardItems=[
-            {
-          title: "Edit",
-          icon: PencilSquareIcon,
-          onClick: (e: any) => {
-            e.stopPropagation();
-            setSelectedWorkflow(workflow);
-            setShowWorkflowModal(true);
+      if (workflow.user_id === user?.email) {
+        cardItems = [
+          {
+            title: "Edit",
+            icon: PencilSquareIcon,
+            onClick: (e: any) => {
+              e.stopPropagation();
+              setSelectedWorkflow(workflow);
+              setShowWorkflowModal(true);
+            },
+            hoverText: "Edit",
           },
-          hoverText: "Edit",
-        },
-          ...cardItems, {
-          title: "Delete",
-          icon: TrashIcon,
-          onClick: (e: any) => {
-            e.stopPropagation();
-            deleteWorkFlow(workflow);
+          ...cardItems,
+          {
+            title: "Delete",
+            icon: TrashIcon,
+            onClick: (e: any) => {
+              e.stopPropagation();
+              deleteWorkFlow(workflow);
+            },
+            hoverText: "Delete",
           },
-          hoverText: "Delete",
-        },]
+        ];
       }
 
       return (
@@ -201,8 +201,8 @@ const WorkflowView = ({}: any) => {
             className="  block p-2"
             title={<div className="  ">{truncateText(workflow.name, 25)}</div>}
             onClick={() => {
-       // setSelectedWorkflow(workflow);
-       //        setShowWorkflowModal(true);
+              // setSelectedWorkflow(workflow);
+              //        setShowWorkflowModal(true);
             }}
           >
             <div
@@ -224,8 +224,42 @@ const WorkflowView = ({}: any) => {
           </Card>
         </li>
       );
-    }
-  );
+    });
+  };
+
+  const items: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "All",
+      children: (
+        <ul className="flex flex-wrap gap-3"> {workflowRows(workflows!)}</ul>
+      ),
+    },
+    {
+      key: "2",
+      label: "Community",
+      children: (
+        <ul className="flex flex-wrap gap-3">
+          {" "}
+          {workflowRows(
+            workflows!.filter((workflow) => workflow.user_id !== user?.email)
+          )}
+        </ul>
+      ),
+    },
+    {
+      key: "3",
+      label: "My",
+      children: (
+        <ul className="flex flex-wrap gap-3">
+          {" "}
+          {workflowRows(
+            workflows!.filter((workflow) => workflow.user_id === user?.email)
+          )}
+        </ul>
+      ),
+    },
+  ];
 
   const WorkflowModal = ({
     workflow,
@@ -388,7 +422,7 @@ const WorkflowView = ({}: any) => {
           <div className="flex mt-2 pb-2 mb-2 border-b">
             <div className="flex-1 font-semibold  mb-2 ">
               {" "}
-              Workflows ({workflowRows.length}){" "}
+              Workflows ({workflows ? workflowRows(workflows!).length : 0}){" "}
             </div>
             <div className=" ">
               <Dropdown.Button
@@ -415,7 +449,7 @@ const WorkflowView = ({}: any) => {
               className="w-full relative"
             >
               <LoadingOverlay loading={loading} />
-              <ul className="flex flex-wrap gap-3">{workflowRows}</ul>
+              <Tabs defaultActiveKey="1" items={items} />
             </div>
           )}
           {workflows && workflows.length === 0 && !loading && (

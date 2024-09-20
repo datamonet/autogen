@@ -6,9 +6,14 @@ import {
   getRandomIntFromDateAndSalt,
   getServerUrl,
 } from "../../../utils";
-import { Button, Drawer, Input, Select, Tabs, message, theme } from "antd";
+import { Button, Drawer, Input, Select, Tabs, message, Switch } from "antd";
 import { appContext } from "../../../../hooks/provider";
-import { BugAntIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import {
+  BugAntIcon,
+  UserGroupIcon,
+  CheckIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { WorkflowAgentSelector, WorkflowTypeSelector } from "./selectors";
 import ChatBox from "../../playground/chatbox";
 
@@ -30,7 +35,7 @@ export const WorkflowViewConfig = ({
   const [controlChanged, setControlChanged] = React.useState<boolean>(false);
   const [localWorkflow, setLocalWorkflow] = React.useState<IWorkflow>(workflow);
 
-  const updateFlowConfig = (key: string, value: string) => {
+  const updateFlowConfig = (key: string, value: string | boolean) => {
     // When an updatedFlowConfig is created using localWorkflow, if the contents of FlowConfigViewer Modal are changed after the Agent Specification Modal is updated, the updated contents of the Agent Specification Modal are not saved. Fixed to localWorkflow->flowConfig. Fixed a bug.
     const updatedFlowConfig = { ...workflow, [key]: value };
 
@@ -145,6 +150,22 @@ export const WorkflowViewConfig = ({
                   { label: "llm", value: "llm" },
                 ] as any
               }
+            />
+          }
+        />
+        <ControlRowView
+          title="Public Status"
+          description="Defines the method to summarize the conversation"
+          value={localWorkflow.public ? "Public" : "Private"}
+          control={
+            <Switch
+              className="mt-2"
+              onChange={(value: boolean) => {
+                updateFlowConfig("public", value);
+              }}
+              checkedChildren={<CheckIcon className="w-3 h-3 mt-1 ml-1" />}
+              unCheckedChildren={<XMarkIcon className="w-3 h-3 mt-0.5 ml-1" />}
+              defaultChecked={localWorkflow.public}
             />
           }
         />
