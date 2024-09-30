@@ -78,14 +78,15 @@ class AutoWorkflowManager:
         self.a_human_input_timeout = a_human_input_timeout
         self.connection_id = connection_id
         self.work_dir = work_dir or "work_dir"
-        self.code_executor_pool = {
-            CodeExecutionConfigTypes.local: load_code_execution_config(
-                CodeExecutionConfigTypes.local, work_dir=self.work_dir
-            ),
-            CodeExecutionConfigTypes.docker: load_code_execution_config(
-                CodeExecutionConfigTypes.docker, work_dir=self.work_dir
-            ),
-        }
+        self.code_executor_pool = False
+        # = {
+        #     CodeExecutionConfigTypes.local: load_code_execution_config(
+        #         CodeExecutionConfigTypes.local, work_dir=self.work_dir
+        #     ),
+        #     CodeExecutionConfigTypes.docker: load_code_execution_config(
+        #         CodeExecutionConfigTypes.docker, work_dir=self.work_dir
+        #     ),
+        # }
         if clear_work_dir:
             clear_folder(self.work_dir)
         self.agent_history = []
@@ -340,8 +341,16 @@ class AutoWorkflowManager:
                 config_list.append(sanitized_llm)
             agent.config.llm_config.config_list = config_list
 
-        agent.config.code_execution_config = self.code_executor_pool.get(agent.config.code_execution_config, False)
 
+        
+        
+        # agent.config.code_execution_config = self.code_executor_pool.get(agent.config.code_execution_config, False)
+        # Takin command:之前的逻辑是先创建两个沙盒，然后再根据沙盒的类型来选择执行的沙盒。这里的逻辑是直接根据沙盒的类型来选择执行的沙盒，避免了创建多余的沙盒。判断self.code_executor_pool有没有，没有就...避免开两个沙盒
+        self.code_executor_pool = load_code_execution_config(
+            CodeExecutionConfigTypes.docker, work_dir=self.work_dir
+        ) if agent.config.code_execution_config == 'docker' and self.code_executor_pool is False else False
+        
+        agent.config.code_execution_config = self.code_executor_pool
         if skills:
             for skill in skills:
                 self.workflow_skills.append(skill)
@@ -501,7 +510,8 @@ class AutoWorkflowManager:
 
         usage = self._get_usage_summary()
         # print("usage", usage)
-
+        if self.code_executor_pool:
+            self.code_executor_pool['executor'].stop()
         result_message = Message(
             content=output,
             role="assistant",
@@ -535,6 +545,8 @@ class AutoWorkflowManager:
 
         usage = self._get_usage_summary()
         # print("usage", usage)
+        if self.code_executor_pool:
+            self.code_executor_pool['executor'].stop()
 
         result_message = Message(
             content=output,

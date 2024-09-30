@@ -25,7 +25,7 @@ import {
   IStatus,
   IWorkflow,
 } from "../../types";
-import {examplePrompts, fetchJSON, getServerUrl, guid, setLocalStorage} from "../../utils";
+import { examplePrompts, fetchJSON, getServerUrl, guid } from "../../utils";
 import { appContext } from "../../../hooks/provider";
 import MetaDataView from "./metadata";
 import {
@@ -54,7 +54,7 @@ const ChatBox = ({
   // const session: IChatSession | null = useConfigStore((state) => state.session);
   const textAreaInputRef = React.useRef<HTMLTextAreaElement>(null);
   const messageBoxInputRef = React.useRef<HTMLDivElement>(null);
-  const { user,setUser } = React.useContext(appContext);
+  const { user } = React.useContext(appContext);
   const wsClient = React.useRef<WebSocket | null>(null);
   const wsMessages = React.useRef<IChatMessage[]>([]);
   const [wsConnectionStatus, setWsConnectionStatus] =
@@ -144,195 +144,167 @@ const ChatBox = ({
     );
   });
 
-  const messageListView = messages && messages?.map((message: IChatMessage, i: number) => {
-    const isUser = message.sender === "user";
-    const css = isUser ? "bg-accent text-white  " : "bg-light";
-    // console.log("message", message);
-    let hasMeta = false;
-    if (message.meta) {
-      hasMeta =
-        message.meta.code !== null ||
-        message.meta.images?.length > 0 ||
-        message.meta.files?.length > 0 ||
-        message.meta.scripts?.length > 0;
-    }
+  const messageListView =
+    messages &&
+    messages?.map((message: IChatMessage, i: number) => {
+      const isUser = message.sender === "user";
+      const css = isUser ? "bg-accent text-white  " : "bg-light";
+      // console.log("message", message);
+      let hasMeta = false;
+      if (message.meta) {
+        hasMeta =
+          message.meta.code !== null ||
+          message.meta.images?.length > 0 ||
+          message.meta.files?.length > 0 ||
+          message.meta.scripts?.length > 0;
+      }
 
-    let items: MenuProps["items"] = [];
+      let items: MenuProps["items"] = [];
 
-    if (isUser) {
-      items.push({
-        label: (
+      if (isUser) {
+        items.push({
+          label: (
+            <div
+              onClick={() => {
+                console.log("retrying");
+                runWorkflow(message.text);
+              }}
+            >
+              <ArrowPathIcon
+                role={"button"}
+                title={"Retry"}
+                className="h-4 w-4 mr-1 inline-block"
+              />
+              Retry
+            </div>
+          ),
+          key: "retrymessage",
+        });
+        items.push({
+          label: (
+            <div
+              onClick={() => {
+                // copy to clipboard
+                navigator.clipboard.writeText(message.text);
+                ToastMessage.success("Message copied to clipboard");
+              }}
+            >
+              <DocumentDuplicateIcon
+                role={"button"}
+                title={"Copy"}
+                className="h-4 w-4 mr-1 inline-block"
+              />
+              Copy
+            </div>
+          ),
+          key: "copymessage",
+        });
+      }
+
+      const menu = (
+        <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
           <div
-            onClick={() => {
-              console.log("retrying");
-              runWorkflow(message.text);
-            }}
+            role="button"
+            className="float-right ml-2 duration-100 hover:bg-secondary font-semibold px-2 pb-1  rounded"
           >
-            <ArrowPathIcon
-              role={"button"}
-              title={"Retry"}
-              className="h-4 w-4 mr-1 inline-block"
-            />
-            Retry
+            <span className="block -mt-2 text-primary  "> ...</span>
           </div>
-        ),
-        key: "retrymessage",
-      });
-      items.push({
-        label: (
-          <div
-            onClick={() => {
-              // copy to clipboard
-              navigator.clipboard.writeText(message.text);
-              ToastMessage.success("Message copied to clipboard");
-            }}
-          >
-            <DocumentDuplicateIcon
-              role={"button"}
-              title={"Copy"}
-              className="h-4 w-4 mr-1 inline-block"
-            />
-            Copy
-          </div>
-        ),
-        key: "copymessage",
-      });
-    }
+        </Dropdown>
+      );
 
-    const menu = (
-      <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
+      return (
         <div
-          role="button"
-          className="float-right ml-2 duration-100 hover:bg-secondary font-semibold px-2 pb-1  rounded"
+          id={"message" + i}
+          className={`align-right ${
+            isUser ? "text-righpt" : ""
+          }  mb-2 border-b`}
+          key={"message" + i}
         >
-          <span className="block -mt-2 text-primary  "> ...</span>
-        </div>
-      </Dropdown>
-    );
-
-    return (
-      <div
-        id={"message" + i} className={`align-right ${isUser ? "text-righpt" : ""}  mb-2 border-b`}
-        key={"message" + i}
-      >
-        {" "}
-        <div className={`  ${isUser ? "" : " w-full"} inline-flex gap-2`}>
-          <div className=""></div>
-          <div className="font-semibold text-secondary text-sm w-16">{`${
-            isUser ? "USER" : "AGENTS"
-          }`}</div>
-          <div
-            className={`inline-block group relative w-full p-2 rounded  ${css}`}
-          >
-            {" "}
-            {items.length > 0 && editable && (
-              <div className=" group-hover:opacity-100 opacity-0 ">{menu}</div>
-            )}
-            {isUser && (
-              <>
-                <div className="inline-block">{message.text}</div>
-              </>
-            )}
-            {!isUser && (
-              <div
-                className={` w-full chatbox prose dark:prose-invert text-primary rounded `}
-              >
-                <MarkdownView
-                  className="text-sm"
-                  data={message.text}
-                  showCode={false}
-                />
-              </div>
-            )}
-            {message.meta && !isUser && (
-              <>
-                {" "}
-                <Tabs
-                  defaultActiveKey="1"
-                  items={[
-                    {
-                      label: (
-                        <>
-                          {" "}
-                          <ChatBubbleLeftRightIcon className="h-4 w-4 inline-block mr-1" />
-                          Agent Messages
-                        </>
-                      ),
-                      key: "1",
-                      children: (
-                        <div className="text-primary">
-                          <MetaDataView metadata={message.meta} />
-                        </div>
-                      ),
-                    },
-                    {
-                      label: (
-                        <div>
-                          {" "}
-                          <SignalSlashIcon className="h-4 w-4 inline-block mr-1" />{" "}
-                          Profiler
-                        </div>
-                      ),
-                      key: "2",
-                      children: (
-                        <div className="text-primary">
-                          <ProfilerView agentMessage={message} />
-                        </div>
-                      ),
-                    },
-                  ]}
-                />
-              </>
-            )}
+          {" "}
+          <div className={`  ${isUser ? "" : " w-full"} inline-flex gap-2`}>
+            <div className=""></div>
+            <div className="font-semibold text-secondary text-sm w-16">{`${
+              isUser ? "USER" : "AGENTS"
+            }`}</div>
+            <div
+              className={`inline-block group relative w-full p-2 rounded  ${css}`}
+            >
+              {" "}
+              {items.length > 0 && editable && (
+                <div className=" group-hover:opacity-100 opacity-0 ">
+                  {menu}
+                </div>
+              )}
+              {isUser && (
+                <>
+                  <div className="inline-block">{message.text}</div>
+                </>
+              )}
+              {!isUser && (
+                <div
+                  className={` w-full chatbox prose dark:prose-invert text-primary rounded `}
+                >
+                  <MarkdownView
+                    className="text-sm"
+                    data={message.text}
+                    showCode={false}
+                  />
+                </div>
+              )}
+              {message.meta && !isUser && (
+                <>
+                  {" "}
+                  <Tabs
+                    defaultActiveKey="1"
+                    items={[
+                      {
+                        label: (
+                          <>
+                            {" "}
+                            <ChatBubbleLeftRightIcon className="h-4 w-4 inline-block mr-1" />
+                            Agent Messages
+                          </>
+                        ),
+                        key: "1",
+                        children: (
+                          <div className="text-primary">
+                            <MetaDataView metadata={message.meta} />
+                          </div>
+                        ),
+                      },
+                      {
+                        label: (
+                          <div>
+                            {" "}
+                            <SignalSlashIcon className="h-4 w-4 inline-block mr-1" />{" "}
+                            Profiler
+                          </div>
+                        ),
+                        key: "2",
+                        children: (
+                          <div className="text-primary">
+                            <ProfilerView agentMessage={message} />
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    );
-  });
-
-  // takin command:扣费操作
-  const updateCredits = (message: IChatMessage) => {
-    const profilerUrl = `${serverUrl}/update`;
-    const payLoad = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: user?.id,
-        message_id: message.id,
-      }),
-    };
-
-    const onSuccess = (data: any) => {
-      setUser({...user,...data})
-      setLocalStorage("user_info", {...user,...data});
-    };
-    const onError = (err: any) => {
-      console.log(err)
-    };
-    fetchJSON(profilerUrl, payLoad, onSuccess, onError);
-  };
-
+      );
+    });
 
   React.useEffect(() => {
-    // takin command: messgaes updated，判断最后一个是否是TERMINATE，如果是则进行扣费操作
-    console.log("messages updated, scrolling",messages);
-      if (messages && messages.length > 0) {
-        const lastMessage = messages[messages.length - 1];
-
-        // Check if meta and meta.usage exist and if meta.usage is an array
-        if (lastMessage.meta && Array.isArray(lastMessage.meta.usage) && lastMessage.meta.usage.length > 0) {
-            updateCredits(lastMessage);
-        }
-    }
-
+    // console.log("messages updated, scrolling");
     setTimeout(() => {
       scrollChatBox(messageBoxInputRef);
     }, 500);
   }, [messages]);
 
-  const textAreaDefaultHeight = "64px";
+  const textAreaDefaultHeight = "55px";
   // clear text box if loading has just changed to false and there is no error
   React.useEffect(() => {
     if ((awaitingUserInput || loading === false) && textAreaInputRef.current) {
@@ -412,8 +384,8 @@ const ChatBox = ({
           // console.log("received message", data, socketMsgs.length);
         } else if (data && data.type === "user_input_request") {
           setAwaitingUserInput(true); // Set awaiting input state
-          textAreaInputRef.current.value = ""
-          textAreaInputRef.current.placeholder = data.data.message.content
+          textAreaInputRef.current.value = "";
+          textAreaInputRef.current.placeholder = data.data.message.content;
           const newsocketMessages = Object.assign([], socketMessages);
           newsocketMessages.push(data.data);
           setSocketMessages(newsocketMessages);
@@ -422,7 +394,7 @@ const ChatBox = ({
             scrollChatBox(socketDivRef);
             scrollChatBox(messageBoxInputRef);
           }, 200);
-          ToastMessage.info(data.data.message)
+          ToastMessage.info(data.data.message);
         } else if (data && data.type === "agent_status") {
           // indicates a status message update
           const agentStatusSpan = document.getElementById("agentstatusspan");
@@ -580,7 +552,7 @@ const ChatBox = ({
     setError(null);
     setLoading(true);
 
-    textAreaInputRef.current.placeholder = "Write message here..."
+    textAreaInputRef.current.placeholder = "Write message here...";
 
     const userMessage: IChatMessage = {
       text: userResponse,
@@ -608,7 +580,7 @@ const ChatBox = ({
         })
       );
     } else {
-        console.err("websocket client error")
+      console.err("websocket client error");
     }
   };
 
@@ -622,7 +594,7 @@ const ChatBox = ({
     event: React.KeyboardEvent<HTMLTextAreaElement>
   ): void => {
     if (event.key === "Enter" && !event.shiftKey) {
-      if (textAreaInputRef.current &&(awaitingUserInput || !loading)) {
+      if (textAreaInputRef.current && (awaitingUserInput || !loading)) {
         event.preventDefault();
         if (awaitingUserInput) {
           sendUserResponse(textAreaInputRef.current.value); // New function call for sending user input
@@ -663,7 +635,7 @@ const ChatBox = ({
     <div
       id="chatbox-main"
       style={{ height: "calc(100vh - " + heightOffset + "px)" }}
-      className="text-primary relative rounded z-10"
+      className="text-primary    relative   rounded  "
       ref={mainDivRef}
     >
       <div
@@ -703,7 +675,10 @@ const ChatBox = ({
           </div>
         )}
 
-        <div id="message-list" className="ml-2"> {messageListView}</div>
+        <div id="message-list" className="ml-2">
+          {" "}
+          {messageListView}
+        </div>
         {(loading || awaitingUserInput) && (
           <div id="loading-bar" className={` inline-flex gap-2 duration-300 `}>
             <div className=""></div>
@@ -763,11 +738,16 @@ const ChatBox = ({
         )}
       </div>
       {editable && (
-        <div id="input-area" className="mt-2 p-2 absolute   bg-primary  bottom-0 w-full">
+        <div
+          id="input-area"
+          className="p-2 absolute bg-primary bottom-0 w-full"
+        >
           <div
             id="input-form"
-            className={`rounded p-2 shadow-lg flex mb-1  gap-2 ${
-              loading && !awaitingUserInput ? " opacity-50 pointer-events-none" : ""
+            className={`rounded p-2 shadow-lg flex mb-1 gap-2 ${
+              loading && !awaitingUserInput
+                ? " opacity-50 pointer-events-none"
+                : ""
             }`}
           >
             {/* <input className="flex-1 p-2 ring-2" /> */}
@@ -786,20 +766,25 @@ const ChatBox = ({
                 onChange={handleTextChange}
                 placeholder="Write message here..."
                 ref={textAreaInputRef}
-                className="flex items-center w-full resize-none text-gray-600 bg-white p-2 ring-2 rounded-sm pl-5 pr-16 h-64"
-                style={{
-                  maxHeight: "120px",
-                  overflowY: "auto",
-                  minHeight: "50px",
-                }}
+                className="flex items-center w-full resize-none text-gray-600 bg-white p-2 ring-2 rounded-sm pl-5 pr-16"
+                // style={{
+                //   maxHeight: "120px",
+                //   overflowY: "auto",
+                //   minHeight: "50px",
+                // }}
               />
               <div
                 id="send-button"
                 role={"button"}
-                style={{ width: "45px", height: "35px" }}
+                className="absolute right-3 bottom-2 bg-accent 
+                hover:brightness-75 transition duration-300 rounded cursor-pointer flex justify-center items-center h-9 w-14"
+                // style={{ width: "45px", height: "35px" }}
                 title="Send message"
                 onClick={() => {
-                  if (textAreaInputRef.current && (awaitingUserInput || !loading)) {
+                  if (
+                    textAreaInputRef.current &&
+                    (awaitingUserInput || !loading)
+                  ) {
                     if (awaitingUserInput) {
                       sendUserResponse(textAreaInputRef.current.value); // Use the new function for user input
                     } else {
@@ -807,7 +792,6 @@ const ChatBox = ({
                     }
                   }
                 }}
-                className="absolute right-3 bottom-2 bg-accent hover:brightness-75 transition duration-300 rounded cursor-pointer flex justify-center items-center"
               >
                 {" "}
                 {(awaitingUserInput || !loading) && (
@@ -838,14 +822,19 @@ const ChatBox = ({
             <div
               id="prompt-buttons"
               className={`mt-2 inline-flex gap-2 flex-wrap  ${
-                (loading && !awaitingUserInput) ? "brightness-75 pointer-events-none" : ""
+                loading && !awaitingUserInput
+                  ? "brightness-75 pointer-events-none"
+                  : ""
               }`}
             >
               {promptButtons}
             </div>
           </div>
           {error && !error.status && (
-            <div id="error-message" className="p-2   rounded mt-4 text-orange-500 text-sm">
+            <div
+              id="error-message"
+              className="p-2   rounded mt-4 text-orange-500 text-sm"
+            >
               {" "}
               <ExclamationTriangleIcon className="h-5 text-orange-500 inline-block mr-2" />{" "}
               {error.message}
