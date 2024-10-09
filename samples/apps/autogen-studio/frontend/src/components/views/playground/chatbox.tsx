@@ -122,7 +122,8 @@ const ChatBox = ({
   };
 
    // takin command:扣费操作
-  const updateCredits = (message: IChatMessage) => {
+  const updateCredits = (message_id: string) => {
+    console.log(message_id)
     const profilerUrl = `${serverUrl}/update`;
     const payLoad = {
       method: "POST",
@@ -131,7 +132,7 @@ const ChatBox = ({
       },
       body: JSON.stringify({
         user_id: user?.id,
-        message_id: message.id,
+        message_id:message_id,
       }),
     };
 
@@ -144,20 +145,6 @@ const ChatBox = ({
     };
     fetchJSON(profilerUrl, payLoad, onSuccess, onError);
   };
-
-   React.useEffect(() => {
-    // takin command: messgaes updated，判断最后一个是否是TERMINATE，如果是则进行扣费操作
-    console.log("messages updated, scrolling",messages);
-    if (messages && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if ((lastMessage.meta.usage || []).length>0) {
-        updateCredits(lastMessage);
-      }
-    }
-    setTimeout(() => {
-      scrollChatBox(messageBoxInputRef);
-    }, 500);
-  }, [messages]);
 
   React.useEffect(() => {
     // console.log("initMessages changed", initMessages);
@@ -441,9 +428,13 @@ const ChatBox = ({
           }
         } else if (data && data.type === "agent_response") {
           // indicates a final agent response
+          // takin command:如果是最后的就执行扣费
+          console.log('---------',data)
           setAwaitingUserInput(false); // Set awaiting input state
           setAreSessionButtonsDisabled(false);
           processAgentResponse(data.data);
+
+          updateCredits(data.data.data.id)
         }
       };
 
@@ -592,10 +583,6 @@ const ChatBox = ({
 
     textAreaInputRef.current.placeholder = "Write message here...";
 
-    const userMessage: IChatMessage = {
-      text: userResponse,
-      sender: "system",
-    };
 
     const messagePayload: IMessage = {
       role: "user",
