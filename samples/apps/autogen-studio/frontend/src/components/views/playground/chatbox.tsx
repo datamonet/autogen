@@ -25,7 +25,7 @@ import {
   IStatus,
   IWorkflow,
 } from "../../types";
-import { examplePrompts, fetchJSON, getServerUrl, guid } from "../../utils";
+import { examplePrompts, fetchJSON, getServerUrl, setLocalStorage } from "../../utils";
 import { appContext } from "../../../hooks/provider";
 import MetaDataView from "./metadata";
 import {
@@ -51,10 +51,10 @@ const ChatBox = ({
   editable?: boolean;
   heightOffset?: number;
 }) => {
+  const { user,setUser } = React.useContext(appContext);
   // const session: IChatSession | null = useConfigStore((state) => state.session);
   const textAreaInputRef = React.useRef<HTMLTextAreaElement>(null);
   const messageBoxInputRef = React.useRef<HTMLDivElement>(null);
-  const { user } = React.useContext(appContext);
   const wsClient = React.useRef<WebSocket | null>(null);
   const wsMessages = React.useRef<IChatMessage[]>([]);
   const [wsConnectionStatus, setWsConnectionStatus] =
@@ -120,6 +120,44 @@ const ChatBox = ({
   const parseMessages = (messages: any) => {
     return messages?.map(parseMessage);
   };
+
+   // takin command:扣费操作
+  const updateCredits = (message: IChatMessage) => {
+    const profilerUrl = `${serverUrl}/update`;
+    const payLoad = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: user?.id,
+        message_id: message.id,
+      }),
+    };
+
+    const onSuccess = (data: any) => {
+      setUser({...user,...data})
+      setLocalStorage("user_info", {...user,...data});
+    };
+    const onError = (err: any) => {
+      console.log(err)
+    };
+    fetchJSON(profilerUrl, payLoad, onSuccess, onError);
+  };
+
+   React.useEffect(() => {
+    // takin command: messgaes updated，判断最后一个是否是TERMINATE，如果是则进行扣费操作
+    console.log("messages updated, scrolling",messages);
+    if (messages && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if ((lastMessage.meta.usage || []).length>0) {
+        updateCredits(lastMessage);
+      }
+    }
+    setTimeout(() => {
+      scrollChatBox(messageBoxInputRef);
+    }, 500);
+  }, [messages]);
 
   React.useEffect(() => {
     // console.log("initMessages changed", initMessages);
