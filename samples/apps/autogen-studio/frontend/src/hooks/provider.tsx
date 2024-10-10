@@ -60,7 +60,7 @@ const Provider = ({ children }: any) => {
       }
       const userInfo = getLocalStorage("user_info");
       if (userInfo !== null) {
-        setUser(userInfo);
+        setUser(data.data);
         setInit(true);
         return;
       }
