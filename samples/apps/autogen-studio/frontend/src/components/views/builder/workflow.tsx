@@ -228,13 +228,13 @@ const WorkflowView = ({}: any) => {
   };
 
   const items: TabsProps["items"] = [
-    {
-      key: "1",
-      label: "All",
-      children: (
-        <ul className="flex flex-wrap gap-3"> {workflowRows(workflows!)}</ul>
-      ),
-    },
+    // {
+    //   key: "1",
+    //   label: "All",
+    //   children: (
+    //     <ul className="flex flex-wrap gap-3"> {workflowRows(workflows!)}</ul>
+    //   ),
+    // },
     {
       key: "2",
       label: "Community",
@@ -249,7 +249,7 @@ const WorkflowView = ({}: any) => {
     },
     {
       key: "3",
-      label: "My",
+      label: "Mine",
       children: (
         <ul className="flex flex-wrap gap-3">
           {" "}
@@ -449,7 +449,7 @@ const WorkflowView = ({}: any) => {
               className="w-full relative"
             >
               <LoadingOverlay loading={loading} />
-              <Tabs defaultActiveKey="1" items={items} />
+              <Tabs defaultActiveKey="3" items={items} />
             </div>
           )}
           {workflows && workflows.length === 0 && !loading && (

@@ -217,11 +217,11 @@ const AgentsView = ({}: any) => {
   };
 
   const items: TabsProps["items"] = [
-    {
-      key: "1",
-      label: "All",
-      children: <ul className="flex flex-wrap gap-3"> {agentRows(agents!)}</ul>,
-    },
+    // {
+    //   key: "1",
+    //   label: "All",
+    //   children: <ul className="flex flex-wrap gap-3"> {agentRows(agents!)}</ul>,
+    // },
     {
       key: "2",
       label: "Community",
@@ -234,7 +234,7 @@ const AgentsView = ({}: any) => {
     },
     {
       key: "3",
-      label: "My",
+      label: "Mine",
       children: (
         <ul className="flex flex-wrap gap-3">
           {" "}
@@ -405,7 +405,7 @@ const AgentsView = ({}: any) => {
           {agents && agents.length > 0 && (
             <div className="w-full  relative">
               <LoadingOverlay loading={loading} />
-              <Tabs defaultActiveKey="1" items={items} />
+              <Tabs defaultActiveKey="3" items={items} />
             </div>
           )}
 

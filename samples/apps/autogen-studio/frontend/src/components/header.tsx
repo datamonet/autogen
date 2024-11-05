@@ -70,9 +70,12 @@ const Header = ({ meta, link }: any) => {
             <div className="flex justify-between h-16">
               <div className="flex lg:px-0">
                 <div className="flex flex-shrink-0 justify-center items-center">
-                  <div className="inline-block text-slate-900 bg-primary mr-1 pt-2">
-                    <Logo className="w-[100px]"/>
-                  </div>
+                  <Link
+                    className="inline-block text-slate-900 bg-primary mr-1 pt-2"
+                    to="https://app.takin.ai/"
+                  >
+                    <Logo className="w-[100px]" />
+                  </Link>
                 </div>
 
                 <div className="hidden md:ml-6 md:flex md:space-x-6">
@@ -121,37 +124,35 @@ const Header = ({ meta, link }: any) => {
                   {/*<DarkModeToggle />*/}
 
                   {user && (
-                      <>
-                        <div className="ml-3 flex items-center space-x-2">
-
-                            <Icon icon="wallet" size={6}/>
-                            <span className="text-sm text-primary"
-                                  title={`Subscription credits: ${(
-                                      Number(user?.subscription_credits) || 0
-                                  ).toFixed(2)} + Extra credits: ${(
-                                      Number(user?.extra_credits) || 0
-                                  ).toFixed(2)}`}
-                            >
-                        {(
+                    <>
+                      <div className="ml-3 flex items-center space-x-2">
+                        <Icon icon="wallet" size={6} />
+                        <span
+                          className="text-sm text-primary"
+                          title={`Subscription credits: ${(
+                            Number(user?.subscription_credits) || 0
+                          ).toFixed(2)} + Extra credits: ${(
+                            Number(user?.extra_credits) || 0
+                          ).toFixed(2)}`}
+                        >
+                          {(
                             (Number(user?.subscription_credits) || 0) +
                             (Number(user?.extra_credits) || 0)
-                        ).toFixed(2)}
-                      </span>
+                          ).toFixed(2)}
+                        </span>
+                      </div>
 
-                        </div>
-
-                        {/* Profile dropdown */}
-                        <Menu as="div" className="ml-4 relative flex-shrink-0">
-                          <div>
-                            <Menu.Button
-                                className="bg-primary rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
-                              <span className="sr-only">Open user menu</span>
-                              {userAvatarUrl && (
-                                  <img
-                                      className="h-8 w-8 rounded-full"
-                                      src={userAvatarUrl}
-                                      alt=""
-                                  />
+                      {/* Profile dropdown */}
+                      <Menu as="div" className="ml-4 relative flex-shrink-0">
+                        <div>
+                          <Menu.Button className="bg-primary rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                            <span className="sr-only">Open user menu</span>
+                            {userAvatarUrl && (
+                              <img
+                                className="h-8 w-8 rounded-full"
+                                src={userAvatarUrl}
+                                alt=""
+                              />
                             )}
                             {!userAvatarUrl && userName && (
                               <div className="border-2 bg-accent pt-1 h-8 w-8 align-middle text-sm text-white rounded-full">
@@ -171,15 +172,18 @@ const Header = ({ meta, link }: any) => {
                         >
                           <Menu.Items className="z-50 origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-primary ring-1 ring-black ring-opacity-5 focus:outline-none">
                             <Menu.Item>
-                        {({ active }) => (
-                          <a
-                            href={`https://takin.ai/user/${user.id}`}
-                            className={classNames(active ? 'bg-secondary' : '', 'block px-4 py-2 text-sm text-primary')}
-                          >
-                          Settings
-                          </a>
-                        )}
-                      </Menu.Item>
+                              {({ active }) => (
+                                <a
+                                  href={`https://takin.ai/user/${user.id}`}
+                                  className={classNames(
+                                    active ? "bg-secondary" : "",
+                                    "block px-4 py-2 text-sm text-primary"
+                                  )}
+                                >
+                                  Settings
+                                </a>
+                              )}
+                            </Menu.Item>
 
                             <Menu.Item>
                               {({ active }) => (
