@@ -1,5 +1,6 @@
 import Logo from "./logo";
 import Icon from "./icons";
+import { navigate } from "gatsby";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   XMarkIcon,
@@ -70,12 +71,12 @@ const Header = ({ meta, link }: any) => {
             <div className="flex justify-between h-16">
               <div className="flex lg:px-0">
                 <div className="flex flex-shrink-0 justify-center items-center">
-                  <Link
-                    className="inline-block text-slate-900 bg-primary mr-1 pt-2"
-                    to="https://app.takin.ai/"
+                  <div
+                    className="inline-block text-slate-900 bg-primary mr-1 pt-2 cursor-pointer"
+                    onClick={() => navigate("https://app.takin.ai/")}
                   >
                     <Logo className="w-[100px]" />
-                  </Link>
+                  </div>
                 </div>
 
                 <div className="hidden md:ml-6 md:flex md:space-x-6">
