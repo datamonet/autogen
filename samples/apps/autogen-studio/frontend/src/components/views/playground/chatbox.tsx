@@ -25,7 +25,12 @@ import {
   IStatus,
   IWorkflow,
 } from "../../types";
-import { examplePrompts, fetchJSON, getServerUrl, setLocalStorage } from "../../utils";
+import {
+  examplePrompts,
+  fetchJSON,
+  getServerUrl,
+  setLocalStorage,
+} from "../../utils";
 import { appContext } from "../../../hooks/provider";
 import MetaDataView from "./metadata";
 import {
@@ -51,7 +56,7 @@ const ChatBox = ({
   editable?: boolean;
   heightOffset?: number;
 }) => {
-  const { user,setUser } = React.useContext(appContext);
+  const { user, setUser } = React.useContext(appContext);
   // const session: IChatSession | null = useConfigStore((state) => state.session);
   const textAreaInputRef = React.useRef<HTMLTextAreaElement>(null);
   const messageBoxInputRef = React.useRef<HTMLDivElement>(null);
@@ -121,9 +126,9 @@ const ChatBox = ({
     return messages?.map(parseMessage);
   };
 
-   // takin command:扣费操作
+  // takin command:扣费操作
   const updateCredits = (message_id: string) => {
-    console.log(message_id)
+    console.log(message_id);
     const profilerUrl = `${serverUrl}/update`;
     const payLoad = {
       method: "POST",
@@ -132,16 +137,17 @@ const ChatBox = ({
       },
       body: JSON.stringify({
         user_id: user?.id,
-        message_id:message_id,
+        message_id: message_id,
       }),
     };
 
     const onSuccess = (data: any) => {
-      setUser({...user,...data})
-      setLocalStorage("user_info", {...user,...data});
+      console.log("onSuccess data", data);
+      setUser({ ...user, ...data });
+      setLocalStorage("user_info", { ...user, ...data });
     };
     const onError = (err: any) => {
-      console.log(err)
+      console.log(err);
     };
     fetchJSON(profilerUrl, payLoad, onSuccess, onError);
   };
@@ -429,12 +435,12 @@ const ChatBox = ({
         } else if (data && data.type === "agent_response") {
           // indicates a final agent response
           // takin command:如果是最后的就执行扣费
-          console.log('---------',data)
+          console.log("---------", data);
           setAwaitingUserInput(false); // Set awaiting input state
           setAreSessionButtonsDisabled(false);
           processAgentResponse(data.data);
 
-          updateCredits(data.data.data.id)
+          updateCredits(data.data.data.id);
         }
       };
 
@@ -582,7 +588,6 @@ const ChatBox = ({
     setLoading(true);
 
     textAreaInputRef.current.placeholder = "Write message here...";
-
 
     const messagePayload: IMessage = {
       role: "user",

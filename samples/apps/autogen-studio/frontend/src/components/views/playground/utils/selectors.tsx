@@ -39,10 +39,13 @@ const WorkflowSelector = ({
 
     const onSuccess = (data: any) => {
       if (data && data.status) {
+        const mineWorkflows = data.data.filter(
+          (workflow: any) => workflow.user_id === user?.email
+        );
         // message.success(data.message);
-        setWorkflows(data.data);
+        setWorkflows(mineWorkflows);
         if (data.data.length > 0) {
-          setWorkflow(data.data[0]);
+          setWorkflow(mineWorkflows[0]);
         }
       } else {
         message.error(data.message);

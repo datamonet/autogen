@@ -413,8 +413,7 @@ async def get_linked_agents(agent_id: int):
 async def list_workflows(user_id: str):
     """List all workflows for a user"""
     filters = {"user_id": user_id}
-    return list_entity(Workflow, filters=filters)
-    # return list_entity(Workflow, filters=filters, or_filters={"public": True})
+    return list_entity(Workflow, filters=filters, or_filters={"public": True})
 
 
 @api.get("/workflows/{workflow_id}")
