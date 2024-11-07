@@ -228,13 +228,20 @@ const WorkflowView = ({}: any) => {
   };
 
   const items: TabsProps["items"] = [
-    // {
-    //   key: "1",
-    //   label: "All",
-    //   children: (
-    //     <ul className="flex flex-wrap gap-3"> {workflowRows(workflows!)}</ul>
-    //   ),
-    // },
+    {
+      key: "1",
+      label: "Recommended",
+      children: (
+        <ul className="flex flex-wrap gap-3">
+          {" "}
+          {workflowRows(
+            workflows!.filter(
+              (workflow) => workflow.user_id === "curator@takin.ai"
+            )
+          )}
+        </ul>
+      ),
+    },
     {
       key: "2",
       label: "Community",
@@ -391,7 +398,7 @@ const WorkflowView = ({}: any) => {
   };
 
   return (
-    <div className=" text-primary ">
+    <div className="text-primary">
       <WorkflowModal
         workflow={selectedWorkflow}
         setWorkflow={setSelectedWorkflow}
@@ -417,13 +424,10 @@ const WorkflowView = ({}: any) => {
         setShow={setShowExportModal}
       />
 
-      <div className="mb-2   relative">
-        <div className="     rounded  ">
+      <div className="mb-2 relative">
+        <div className="rounded">
           <div className="flex mt-2 pb-2 mb-2 border-b">
-            <div className="flex-1 font-semibold  mb-2 ">
-              {" "}
-              Workflows ({workflows ? workflowRows(workflows!).length : 0}){" "}
-            </div>
+            <div className="flex-1 font-semibold mb-2">Workflows</div>
             <div className=" ">
               <Dropdown.Button
                 type="primary"

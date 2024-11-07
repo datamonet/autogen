@@ -146,13 +146,13 @@ const ModelsView = ({}: any) => {
 
   const modelRows = (models || []).map((model: IModelConfig, i: number) => {
     let cardItems = [
-        {
+      {
         title: "Edit",
         icon: PencilSquareIcon,
         onClick: (e: any) => {
           e.stopPropagation();
-                 setSelectedModel(model);
-            setShowModelModal(true);
+          setSelectedModel(model);
+          setShowModelModal(true);
         },
         hoverText: "Edit",
       },
@@ -195,7 +195,6 @@ const ModelsView = ({}: any) => {
         },
         hoverText: "Delete",
       },
-
     ];
 
     return (
@@ -354,13 +353,10 @@ const ModelsView = ({}: any) => {
         }}
       />
 
-      <div className="mb-2   relative">
-        <div className="     rounded  ">
+      <div className="mb-2 relative">
+        <div className="rounded">
           <div className="flex mt-2 pb-2 mb-2 border-b">
-            <div className="flex-1 font-semibold mb-2 ">
-              {" "}
-              Models ({modelRows.length}){" "}
-            </div>
+            <div className="flex-1 font-semibold mb-2 "> Models</div>
             <div>
               <Dropdown.Button
                 type="primary"

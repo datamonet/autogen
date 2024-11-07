@@ -217,11 +217,17 @@ const AgentsView = ({}: any) => {
   };
 
   const items: TabsProps["items"] = [
-    // {
-    //   key: "1",
-    //   label: "All",
-    //   children: <ul className="flex flex-wrap gap-3"> {agentRows(agents!)}</ul>,
-    // },
+    {
+      key: "1",
+      label: "Recommended",
+      children: (
+        <ul className="flex flex-wrap gap-3">
+          {agentRows(
+            agents!.filter((agent) => agent.user_id === "curator@takin.ai")
+          )}
+        </ul>
+      ),
+    },
     {
       key: "2",
       label: "Community",
@@ -370,10 +376,7 @@ const AgentsView = ({}: any) => {
       <div className="mb-2 relative">
         <div className="rounded">
           <div className="flex mt-2 pb-2 mb-2 border-b">
-            <div className="flex-1 font-semibold mb-2 ">
-              {" "}
-              Agents ({agents ? agentRows(agents!).length : 0}){" "}
-            </div>
+            <div className="flex-1 font-semibold mb-2 "> Agents</div>
             <div>
               <Dropdown.Button
                 type="primary"

@@ -337,13 +337,10 @@ const SkillsView = ({}: any) => {
         }}
       />
 
-      <div className="mb-2   relative">
+      <div className="mb-2 relative">
         <div className="">
           <div className="flex mt-2 pb-2 mb-2 border-b">
-            <ul className="flex-1   font-semibold mb-2 ">
-              {" "}
-              Skills ({skillRows.length}){" "}
-            </ul>
+            <ul className="flex-1 font-semibold mb-2 "> Skills</ul>
 
             {isAdmin && (
               <div>
