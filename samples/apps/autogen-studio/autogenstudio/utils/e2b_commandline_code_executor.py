@@ -14,6 +14,7 @@ from autogen.coding.utils import silence_pip
 from e2b import Sandbox
 from autogen.coding.base import CodeBlock, CodeExecutor, CodeExtractor, CommandLineCodeResult
 from autogen.coding.markdown_code_extractor import MarkdownCodeExtractor
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,58 @@ filename_patterns = [
     re.compile(r"^# (filename:)?(.+?)$", re.DOTALL),
 ]
 
+# E2B accounts
+
+# password: Just4admin2024$
+# admin@bschools.ai: 
+
+# Admin: e2b_28805f77f5055af5e392b47380a168f7f3eb401e
+# Admin1: e2b_5b8813cda8fac5f2cfc51ac944c9747f102468c9
+# Admin2: e2b_2b5a720fa1791b7764a11022e73149cbeecc85f7
+# admin3: e2b_28914374f5b77fd444eb4201f52da09de4354cc1
+# Admin4: e2b_a6bec1a2acbfca03689702510a336acdedc92057
+# admin5: e2b_ead0384eeb25a1ebc4d0c3197826901efcf467b9
+# admin6: e2b_b2a7d27bd2ce28c822b875bf1832c2c28cc5e26d
+# Admin7: e2b_d643bd26f3b181a95e0f784cadc964b8cc4ffa63
+# Admin8: e2b_aec35baed63c862fa1814981ed1e7b76ab2fb0a6
+# Admin9: e2b_2b988358f795baf8849850a22ab33861c4844ea3
+# Admin10: e2b_d3b508129dfde8384e399162e7ad0e4a42929881
+
+
+
+# support@takin.ai: e2b_6e38c41a101e7fbfde36acf6a3dc2bfea02151ac
+
+
+# Fake emails:
+
+# Just4admin2024$
+
+# test@build.ai: e2b_8d527e8cb4f9bb88f536ea4e971510ae477e230b
+# admin@build.ai: e2b_acd8f50ccab0fe807a1406980f33e219be1b3041
+# support@build.ai: e2b_65f72ef25e09f0ec718edfaf46ce7d0ea1d3d8b5
+# dev@build.ai: e2b_93da56d89c07fbe3388667031a1e31f98033cc89
+# product@build.ai: e2b_10ab63a2b9d3c72d30baeb6190884d55e6217384
+def random_e2b_api_key():
+    e2b_key_list = [
+        'e2b_28805f77f5055af5e392b47380a168f7f3eb401e',
+        'e2b_5b8813cda8fac5f2cfc51ac944c9747f102468c9',
+        'e2b_2b5a720fa1791b7764a11022e73149cbeecc85f7',
+        'e2b_28914374f5b77fd444eb4201f52da09de4354cc1',
+        'e2b_a6bec1a2acbfca03689702510a336acdedc92057',
+        'e2b_ead0384eeb25a1ebc4d0c3197826901efcf467b9',
+        'e2b_b2a7d27bd2ce28c822b875bf1832c2c28cc5e26d',
+        'e2b_d643bd26f3b181a95e0f784cadc964b8cc4ffa63',
+        'e2b_aec35baed63c862fa1814981ed1e7b76ab2fb0a6',
+        'e2b_2b988358f795baf8849850a22ab33861c4844ea3',
+        'e2b_d3b508129dfde8384e399162e7ad0e4a42929881',
+        'e2b_8d527e8cb4f9bb88f536ea4e971510ae477e230b',
+        'e2b_acd8f50ccab0fe807a1406980f33e219be1b3041',
+        'e2b_65f72ef25e09f0ec718edfaf46ce7d0ea1d3d8b5',
+        'e2b_93da56d89c07fbe3388667031a1e31f98033cc89',
+        'e2b_10ab63a2b9d3c72d30baeb6190884d55e6217384',
+        'e2b_23373f3c85a6e71fa1e93f46c011da942a053da5' # faye
+    ]
+    return random.choice(e2b_key_list)
 
 def _get_file_name_from_content(code: str, lang: str) -> str:
     """
@@ -68,7 +121,9 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         self._timeout = 60
         self.sandbox_template = sandbox_template
         # 此时沙盒默认的工作目录是/home/user
-        self._sandbox = Sandbox(template=sandbox_template,
+        self._sandbox = Sandbox(
+            api_key=random_e2b_api_key(),
+            template=sandbox_template,
                                 env_vars={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")},
                                 on_stdout=lambda output: logger.info(">>>> e2b sandbox:", output.line))
         self._work_dir = Path('/home/user')
