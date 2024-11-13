@@ -124,8 +124,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         self._sandbox = Sandbox(
             api_key=random_e2b_api_key(),
             template=sandbox_template,
-                                env_vars={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")},
-                                on_stdout=lambda output: logger.info(">>>> e2b sandbox:", output.line))
+            envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")})
         self._work_dir = Path('/home/user')
         self._bind_dir = bind_dir
         self._code_extractor = None  # 延迟加载的代码提取器
