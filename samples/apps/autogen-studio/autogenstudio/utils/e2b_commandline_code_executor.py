@@ -122,7 +122,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         # 此时沙盒默认的工作目录是/home/user，因为是random不同的api_key，所以暂时取消template参数，避免不同key之间的冲突
         self._sandbox = Sandbox(
             api_key=random_e2b_api_key(),
-            # envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")}
+            envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")}
             )
         self._work_dir = Path('/home/user')
         self._bind_dir = bind_dir
@@ -186,19 +186,24 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             command = ["timeout", str(self._timeout), _cmd(lang), str(code_path)]
             command_str = shlex.join(command)
 
-            result = self._sandbox.commands.run(
-                command_str,
-                on_stdout=lambda data: print(data), on_stderr=lambda data: print(data))
+            try:
+                result = self._sandbox.commands.run(
+                    command_str,
+                    on_stdout=lambda data: print(data), on_stderr=lambda data: print(data))
             
 
-            # result.wait()
-            exit_code = result.exit_code
-            if result.error:
-                outputs.append(result.stderr)
-            else:
-                outputs.append(result.stdout)
+                # result.wait()
+                exit_code = result.exit_code
+                if result.error:
+                    outputs.append(result.stderr)
+                else:
+                    outputs.append(result.stdout)
 
-            last_exit_code = exit_code
+                last_exit_code = exit_code
+            except Exception as e:
+                outputs.append(str(e))
+                last_exit_code = 1
+                break
 
         files = self.sandbox_download_file()
         code_file = str(files[0]) if files else None
