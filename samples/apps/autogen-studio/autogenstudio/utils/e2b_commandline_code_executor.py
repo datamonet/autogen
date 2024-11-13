@@ -132,7 +132,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
 
     def sandbox_download_file(self) -> List[Path]:
         files = []
-        for fileInfo in self._sandbox.filesystem.list(str(self._work_dir)):
+        for fileInfo in self._sandbox.files.list(str(self._work_dir)):
             filename = fileInfo.name
             # 如果文件名以 . 开头，则跳过
             if filename.startswith('.') or fileInfo.is_dir:
@@ -176,7 +176,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             filenames.append(filename)
             code_path = self._work_dir / filename  # 获取完整的沙盒文件地址
 
-            self._sandbox.filesystem.write(str(code_path), code)
+            self._sandbox.files.write(str(code_path), code)
 
             command = ["timeout", str(self._timeout), _cmd(lang), str(code_path)]
             command_str = shlex.join(command)
