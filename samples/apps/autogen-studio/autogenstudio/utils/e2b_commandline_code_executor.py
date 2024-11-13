@@ -11,7 +11,7 @@ from typing import List
 from autogen.code_utils import _cmd, TIMEOUT_MSG
 
 from autogen.coding.utils import silence_pip
-from e2b import Sandbox
+from e2b_code_interpreter import Sandbox
 from autogen.coding.base import CodeBlock, CodeExecutor, CodeExtractor, CommandLineCodeResult
 from autogen.coding.markdown_code_extractor import MarkdownCodeExtractor
 import random
@@ -120,11 +120,11 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         """
         self._timeout = 60
         self.sandbox_template = sandbox_template
-        # 此时沙盒默认的工作目录是/home/user
+        # 此时沙盒默认的工作目录是/home/user，因为是random不同的api_key，所以暂时取消template参数，避免不同key之间的冲突
         self._sandbox = Sandbox(
             api_key=random_e2b_api_key(),
-            template=sandbox_template,
-            envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")})
+            envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")}
+            )
         self._work_dir = Path('/home/user')
         self._bind_dir = bind_dir
         self._code_extractor = None  # 延迟加载的代码提取器

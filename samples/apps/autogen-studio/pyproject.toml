@@ -32,7 +32,7 @@ dependencies = [
     "numpy < 2.0.0",
     "sqlmodel",
     "psycopg",
-    "e2b_code_interpreter",
+    "e2b_code_interpreter>=1.0.0",
     "psycopg2-binary",
     "alembic",
     "loguru",
