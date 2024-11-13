@@ -133,14 +133,19 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         files = []
         for fileInfo in self._sandbox.files.list(str(self._work_dir)):
             filename = fileInfo.name
-            # 如果文件名以 . 开头，则跳过
+            # 如果文件名以 . 开头或者是文件夹，则跳过
             if filename.startswith('.') or fileInfo.type.value=='dir':
                 continue
-            sandbox_path = str(self._work_dir / filename)
-            # 读取文件内容
-            content = self._sandbox.files.read(sandbox_path)
+            # 读取沙盒里文件内容，拼路径，读内容
+            sandbox_path = self._work_dir / filename
+            
+            content = self._sandbox.files.read(str(sandbox_path))
 
+            if isinstance(content, str):
+                content = content.encode('utf-8')
+            # 写本地
             autogen_code_path = self._bind_dir / filename
+            
             with autogen_code_path.open("wb") as f:
                 f.write(content)
             files.extend([autogen_code_path])
