@@ -4,8 +4,7 @@ import logging
 from hashlib import md5
 from pathlib import Path
 import shlex
-from time import sleep
-from typing import Any, ClassVar, Dict, List, Optional, Type, Union
+from typing import ClassVar, Dict, List, Optional, Union
 from typing import List
 
 from autogen.code_utils import _cmd, TIMEOUT_MSG
@@ -138,11 +137,12 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             if filename.startswith('.') or fileInfo.is_dir:
                 continue
             sandbox_path = str(self._work_dir / filename)
-            file_in_bytes = self._sandbox.download_file(sandbox_path)
+            # 读取文件内容
+            content = self._sandbox.read(sandbox_path)
 
             autogen_code_path = self._bind_dir / filename
             with autogen_code_path.open("wb") as f:
-                f.write(file_in_bytes)
+                f.write(content)
             files.extend([autogen_code_path])
         return files
 
@@ -181,10 +181,10 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             command = ["timeout", str(self._timeout), _cmd(lang), str(code_path)]
             command_str = shlex.join(command)
 
-            result = self._sandbox.process.start_and_wait(
+            result = self._sandbox.commands.run(
                 command_str,
-                on_stdout=lambda output: print("process", output.line),
-            )
+                on_stdout=lambda data: print(data), on_stderr=lambda data: print(data))
+            
 
             # result.wait()
             exit_code = result.exit_code
@@ -194,7 +194,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
                 outputs.append(result.stdout)
 
             last_exit_code = exit_code
-            # self._sandbox.close()
+
         files = self.sandbox_download_file()
         code_file = str(files[0]) if files else None
         return CommandLineCodeResult(exit_code=last_exit_code, output="".join(outputs), code_file=code_file)
@@ -202,11 +202,14 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
     def stop(self) -> None:
         """(Experimental) Stop the code executor."""
         logger.info("Stop the E2B Commandline Code Executor...")
-        self._sandbox.close()
+        self._sandbox.kill()
 
     def restart(self) -> None:
         """重启 e2b 沙盒执行器。"""
         logger.info("Restarting the E2B Commandline Code Executor...")
-        self._sandbox.close()  # 关闭当前沙盒
-        self._sandbox = Sandbox(template=self.sandbox_template)  # 使用相同模板重启沙盒
+        self._sandbox.kill() # 关闭当前沙盒
+        self._sandbox = Sandbox(
+            api_key=random_e2b_api_key(),
+            envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")}
+            )  # 使用相同模板重启沙盒
         logger.info("Sandbox restarted.")
