@@ -670,8 +670,7 @@ const ChatBox = ({
     >
       <div
         id="workflow-name"
-        style={{ zIndex: 100 }}
-        className=" absolute right-3 bg-primary   rounded  text-secondary -top-6  p-2"
+        className="absolute right-3 bg-primary z-40 rounded text-secondary -top-6 p-2"
       >
         {" "}
         {workflow && <div className="text-xs"> {workflow.name}</div>}
