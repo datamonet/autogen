@@ -122,7 +122,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         # 此时沙盒默认的工作目录是/home/user，因为是random不同的api_key，所以暂时取消template参数，避免不同key之间的冲突
         self._sandbox = Sandbox(
             api_key=random_e2b_api_key(),
-            envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")}
+            # envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")}
             )
         self._work_dir = Path('/home/user')
         self._bind_dir = bind_dir
@@ -134,11 +134,11 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         for fileInfo in self._sandbox.files.list(str(self._work_dir)):
             filename = fileInfo.name
             # 如果文件名以 . 开头，则跳过
-            if filename.startswith('.') or fileInfo.is_dir:
+            if filename.startswith('.') or fileInfo.type.value=='dir':
                 continue
             sandbox_path = str(self._work_dir / filename)
             # 读取文件内容
-            content = self._sandbox.read(sandbox_path)
+            content = self._sandbox.files.read(sandbox_path)
 
             autogen_code_path = self._bind_dir / filename
             with autogen_code_path.open("wb") as f:
