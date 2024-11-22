@@ -160,10 +160,9 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             # 读取沙盒里文件内容，拼路径，读内容
             sandbox_path = self._work_dir / filename
             
+            # 读取文件内容
             content = self._sandbox.files.read(str(sandbox_path))
-
-            if isinstance(content, str):
-                content = content.encode('utf-8')
+            
             # 写本地
             autogen_code_path = self._bind_dir / filename
             
