@@ -161,7 +161,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             sandbox_path = self._work_dir / filename
             
             # 读取文件内容
-            content = self._sandbox.files.read(str(sandbox_path))
+            content = self._sandbox.files.read(str(sandbox_path),format='bytes')
             
             # 写本地
             autogen_code_path = self._bind_dir / filename
