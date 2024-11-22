@@ -112,6 +112,9 @@ class AutoWorkflowManager:
         if self.sender and self.receiver:
             # save all agent skills to skills.py
             save_skills_to_file(self.workflow_skills, self.work_dir)
+            if self.code_executor_pool:
+                self.code_executor_pool['executor'].check_and_upload_skills()
+                
             if history:
                 self._populate_history(history)
             self.sender.initiate_chat(
@@ -123,7 +126,7 @@ class AutoWorkflowManager:
             raise ValueError("Sender and receiver agents are not defined in the workflow configuration.")
 
     async def _a_run_workflow(
-        self, message: str, history: Optional[List[Message]] = None, clear_history: bool = False
+        self, message: str, history: Optional[List[Message]] = None, clear_history: bool = False,
     ) -> None:
         """
         Asynchronously runs the workflow based on the provided configuration.
@@ -142,6 +145,10 @@ class AutoWorkflowManager:
         if self.sender and self.receiver:
             # save all agent skills to skills.py
             save_skills_to_file(self.workflow_skills, self.work_dir)
+            # takin command: check and upload skills.py to the code executor pool
+            if self.code_executor_pool:
+                self.code_executor_pool['executor'].check_and_upload_skills()
+                
             if history:
                 self._populate_history(history)
             await self.sender.a_initiate_chat(
@@ -346,11 +353,7 @@ class AutoWorkflowManager:
         
         # agent.config.code_execution_config = self.code_executor_pool.get(agent.config.code_execution_config, False)
         # Takin command:之前的逻辑是先创建两个沙盒，然后再根据沙盒的类型来选择执行的沙盒。这里的逻辑是直接根据沙盒的类型来选择执行的沙盒，避免了创建多余的沙盒。判断self.code_executor_pool有没有，没有就...避免开两个沙盒
-        self.code_executor_pool = load_code_execution_config(
-            CodeExecutionConfigTypes.docker, work_dir=self.work_dir
-        ) if agent.config.code_execution_config == 'docker' and self.code_executor_pool is False else False
         
-        agent.config.code_execution_config = self.code_executor_pool
         if skills:
             for skill in skills:
                 self.workflow_skills.append(skill)
@@ -360,6 +363,18 @@ class AutoWorkflowManager:
                 agent.config.system_message = agent.config.system_message + "\n\n" + skills_prompt
             else:
                 agent.config.system_message = get_default_system_message(agent.type) + "\n\n" + skills_prompt
+        
+        if agent.config.code_execution_config == 'docker' and self.code_executor_pool is False:
+            self.code_executor_pool = load_code_execution_config(
+                CodeExecutionConfigTypes.docker, work_dir=self.work_dir
+            )
+      
+        # 耻辱 c =  a if a=1 else b 
+        # self.code_executor_pool = load_code_execution_config(
+        #     CodeExecutionConfigTypes.docker, work_dir=self.work_dir
+        # ) if agent.config.code_execution_config == 'docker' and self.code_executor_pool is False else False
+        
+        agent.config.code_execution_config = self.code_executor_pool
         return agent
 
     def load(self, agent: Any) -> autogen.Agent:

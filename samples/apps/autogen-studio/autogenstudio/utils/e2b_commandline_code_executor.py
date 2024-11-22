@@ -129,10 +129,8 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
         self._code_extractor = None  # 延迟加载的代码提取器
         self.execution_policies = self.DEFAULT_EXECUTION_POLICY.copy()
         
-        # 调用新的函数检查并上传 skills.py
-        self._check_and_upload_skills()
 
-    def _check_and_upload_skills(self):
+    def check_and_upload_skills(self):
         """检查 _bind_dir 内是否有 skills.py 文件，如果有，则上传到 _work_dir。"""
         if self._bind_dir:
             skills_file = self._bind_dir / 'skills.py'
