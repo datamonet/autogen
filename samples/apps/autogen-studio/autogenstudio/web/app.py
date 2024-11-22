@@ -164,7 +164,7 @@ def delete_entity(model_class: Any, filters: dict = None):
 
 @api.get("/login")
 async def get_user(request: Request):
-    """get user info from mongodb"""
+    """get user info from mongodb,关于登录，测试环境直接制定用户email"""
     try:
         token = request.cookies.get(cookie_name)
 
@@ -600,6 +600,7 @@ async def run_session_workflow(message: Message, session_id: int, workflow_id: i
         )
         # save incoming message
         dbmanager.upsert(message)
+        # 文件名是用户的email的md5值
         user_dir = os.path.join(folders["files_static_root"], "user", md5_hash(message.user_id))
         os.makedirs(user_dir, exist_ok=True)
         workflow = workflow_from_id(workflow_id, dbmanager=dbmanager)

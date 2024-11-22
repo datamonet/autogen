@@ -124,17 +124,38 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             api_key=random_e2b_api_key(),
             envs={"OPENAI_API_KEY": os.environ.get("OPENAI_API_KEY")}
             )
-        self._work_dir = Path('/home/user')
-        self._bind_dir = bind_dir
+        self._work_dir = Path('/home/user') # e2b work dir
+        self._bind_dir = bind_dir # local work dir on digitalocean server; skill.py
         self._code_extractor = None  # 延迟加载的代码提取器
         self.execution_policies = self.DEFAULT_EXECUTION_POLICY.copy()
+        
+        # 调用新的函数检查并上传 skills.py
+        self._check_and_upload_skills()
+
+    def _check_and_upload_skills(self):
+        """检查 _bind_dir 内是否有 skills.py 文件，如果有，则上传到 _work_dir。"""
+        if self._bind_dir:
+            skills_file = self._bind_dir / 'skills.py'
+            if skills_file.exists():
+                try:
+                    # 读取本地 skills.py 文件内容
+                    with skills_file.open('rb') as file:
+                        # 上传到 _work_dir
+                        sandbox_skills_path = self._work_dir / 'skills.py'
+                        self._sandbox.files.write(str(sandbox_skills_path), file)
+               
+                except Exception as e:
+                    return
 
     def sandbox_download_file(self) -> List[Path]:
         files = []
         for fileInfo in self._sandbox.files.list(str(self._work_dir)):
             filename = fileInfo.name
-            # 如果文件名以 . 开头或者是文件夹，则跳过
-            if filename.startswith('.') or fileInfo.type.value=='dir':
+            # 如果文件名以 . 开头、是文件夹或者没有扩展名，则跳过
+            if filename.startswith('.') or fileInfo.type.value == 'dir' or '.' not in filename:
+                continue
+            # 如果文件名是 skills.py，则跳过
+            if filename == 'skills.py':
                 continue
             # 读取沙盒里文件内容，拼路径，读内容
             sandbox_path = self._work_dir / filename
@@ -148,7 +169,7 @@ class E2BCommandlineCodeExecutor(CodeExecutor):
             
             with autogen_code_path.open("wb") as f:
                 f.write(content)
-            files.extend([autogen_code_path])
+            files.append(autogen_code_path)
         return files
 
     @property

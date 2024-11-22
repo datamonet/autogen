@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  autogenstudio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autogen
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    volumes:
+      - /mnt/autogen_volume:/home/user/app/files
+    command: gunicorn -w $((2 * $(getconf _NPROCESSORS_ONLN) + 1)) --timeout 12600 -k uvicorn.workers.UvicornWorker
