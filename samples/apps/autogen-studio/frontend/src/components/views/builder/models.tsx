@@ -258,7 +258,7 @@ const ModelsView = ({}: any) => {
         title={
           <>
             Model Specification{" "}
-            <span className="text-accent font-normal">{model?.model}</span>{" "}
+            {/* <span className="text-accent font-normal">{model?.model}</span> */}
           </>
         }
         width={800}

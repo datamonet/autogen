@@ -249,7 +249,7 @@ export const formatDuration = (seconds: number) => {
 export const sampleModelConfig = (modelType: string = "open_ai") => {
   const openaiConfig: IModelConfig = {
     model: "gpt-4-1106-preview",
-    api_type: "open_ai",
+    api_type: "openai",
     description: "OpenAI GPT-4 model",
   };
   const azureConfig: IModelConfig = {
@@ -279,7 +279,7 @@ export const sampleModelConfig = (modelType: string = "open_ai") => {
   };
 
   switch (modelType) {
-    case "open_ai":
+    case "openai":
       return openaiConfig;
     case "azure":
       return azureConfig;

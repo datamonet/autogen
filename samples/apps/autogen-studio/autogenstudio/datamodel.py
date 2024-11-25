@@ -152,7 +152,8 @@ class Model(SQLModel, table=True):
     model: str
     api_key: Optional[str] = None
     base_url: Optional[str] = None
-    api_type: ModelTypes = Field(default=ModelTypes.openai, sa_column=Column(SqlEnum(ModelTypes)))
+    api_type: str 
+    # api_type: ModelTypes = Field(default=ModelTypes.openai, sa_column=Column(SqlEnum(ModelTypes)))
     api_version: Optional[str] = None
     description: Optional[str] = None
     agents: List["Agent"] = Relationship(back_populates="models", link_model=AgentModelLink)
