@@ -22,7 +22,9 @@ class WebSocketConnectionManager:
         """
         if active_connections is None:
             active_connections = []
-        self.active_connections_lock = active_connections_lock
+        # takin command:避免asyncio锁循环
+        # self.active_connections_lock = active_connections_lock
+        self.active_connections_lock = asyncio.Lock()
         self.active_connections: List[Tuple[WebSocket, str]] = active_connections
 
     async def connect(self, websocket: WebSocket, client_id: str) -> None:

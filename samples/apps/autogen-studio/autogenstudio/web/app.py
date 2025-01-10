@@ -37,7 +37,8 @@ active_connections = []
 active_connections_lock = asyncio.Lock()
 websocket_manager = WebSocketConnectionManager(
     active_connections=active_connections,
-    active_connections_lock=active_connections_lock,
+    # takin command:避免锁循环
+    # active_connections_lock=active_connections_lock,
 )
 
 

@@ -1003,7 +1003,10 @@ export const WorkflowAgentSelector = ({
 
     const onSuccess = (data: any) => {
       if (data && data.status) {
-        setAgents(data.data);
+        const filteredAgents = data.data!.filter(
+          (agent: IAgent) => agent.user_id === user?.email
+        );
+        setAgents(filteredAgents);
       } else {
         message.error(data.message);
       }
