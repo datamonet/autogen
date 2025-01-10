@@ -2,7 +2,7 @@ FROM python:3.10
 
 # Install dependencies
 RUN pip install -U gunicorn autogenstudio autogen
-RUN pip install -U PyJWT pymongo psycopg2-binary e2b-code-interpreter
+RUN pip install -U PyJWT pymongo psycopg2-binary anthropic e2b-code-interpreter
 
 # Create the user
 RUN useradd -m -u 1000 user
