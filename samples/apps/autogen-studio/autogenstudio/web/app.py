@@ -7,8 +7,8 @@ import jwt
 import queue
 import threading
 import traceback
+import uuid
 from contextlib import asynccontextmanager
-from bson.objectid import ObjectId
 from typing import Any, Union
 
 from fastapi import FastAPI, Request, Response as FastAPIResponse, WebSocket, WebSocketDisconnect
@@ -20,14 +20,18 @@ from openai import OpenAIError
 from ..chatmanager import AutoGenChatManager
 from ..database import workflow_from_id
 from ..database.dbmanager import DBManager
+from ..database.postgres_client import get_user_by_email
 from ..datamodel import Agent, Message, Model, Response, Session, Skill, Workflow
 from ..profiler import Profiler
 from ..utils import check_and_cast_datetime_fields, init_app_folders, md5_hash, test_model
-from ..database.mongo_client import db
 from ..version import VERSION
 from ..websocket_connection_manager import WebSocketConnectionManager
 
-cookie_name = "__Secure-next-auth.session-token"
+import httpx
+
+# cookie name for authjs v5
+cookie_name = "__Secure-authjs.session-token"
+# cookie_name = "__Secure-next-auth.session-token"
 
 profiler = Profiler()
 managers = {"chat": None}  # manage calls to autogen
@@ -170,15 +174,21 @@ async def get_user(request: Request):
         token = request.cookies.get(cookie_name)
 
         payload = jwt.decode(token, options={"verify_signature": False})
-        user = db["users"].find_one({"email": payload.get("email")})
+        email = payload.get("email")
+        # email = 'faye_1225@163.com'
+        user = get_user_by_email(email)
         if user:
-            user["id"] = str(user.pop("_id"))
+            return {
+                "status": True,
+                "data": user
+            }
         return {
-            "status": True,
-            "data": user
+            "status": False,
+            "message": "User not found"
         }
 
     except Exception as ex_error:
+        print(f"Error in get_user: {str(ex_error)}")
         return {
             "status": False,
             "message": str(ex_error),
@@ -205,67 +215,58 @@ class UpdatePayload(BaseModel):
     message_id: int
 
 
+def convert_to_serializable(obj):
+    """Convert object to JSON serializable format"""
+    if isinstance(obj, set):
+        return list(obj)
+    elif isinstance(obj, dict):
+        return {k: convert_to_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_to_serializable(item) for item in obj]
+    return obj
+
+
 @api.post("/update")
 async def update_user(item: UpdatePayload):
-    """Update user info from MongoDB"""
+    """Update user info through Takin Pricing API"""
     try:
-        # 获取用户文档
-        user_doc = db["users"].find_one({"_id": ObjectId(item.user_id)})
-
-        subscription_credits = user_doc.get('subscription_credits', 0)
-        extra_credits = user_doc.get('extra_credits', 0)
-
         # 获取消息和用户配置文件
         agent_message = dbmanager.get(Message, filters={"id": item.message_id}).data[0]
         profile = profiler.profile(agent_message)
+        
+        # 转换profile为可序列化格式
+        serializable_profile = convert_to_serializable(profile)
 
-        # 检查是否已经扣费
-        if db["bill"].find_one({"userId": item.user_id, "type": "AutoGen Studio", "source": item.message_id}):
-            return {"extra_credits": extra_credits, "subscription_credits": subscription_credits}
+        # 发送请求到计费服务
+        async with httpx.AsyncClient() as client:
+            pricing_url = os.getenv("TAKIN_PRICING_URL")
+            request_data = {
+                "user_id": item.user_id,
+                "agent_profile": serializable_profile
+            }
+            
+            response = await client.post(
+                pricing_url,
+                json=request_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code != 200:
+                raise Exception(f"Pricing API error: {response.text}")
+            
+            result = json.loads(response.text)
+        
+            return {
+                "extra_credits": result.get("extraCredits", 0),
+                "subscription_credits": result.get("subscriptionCredits", 0),
+                "subscription_purchased_credits": result.get("subscriptionPurchasedCredits", 0)
+            }
 
-        # 计算总费用
-        total_usd = sum(item.get("total_cost", 0) for item in profile.get("usage", []))
-        cost = total_usd * 100 * 1.5
-        # 计算 ecb_run_count，默认运行一次e2b就收费0.1积分
-        ecb_run_count = sum(1 for entry in profile['profile'] if entry.get('code_execution', {}).get('is_code') is True)
-        cost += ecb_run_count * 0.1
-
-        # 保证最低消费为0.01
-        total_cost = max(round(cost, 2), 0.01)
-
-        # 扣费逻辑
-        if extra_credits >= total_cost:
-            extra_credits -= total_cost
-        else:
-            total_cost -= extra_credits
-            extra_credits = 0
-            subscription_credits = max(subscription_credits - total_cost, 0)
-
-        # 插入账单记录
-        db["bill"].insert_one({
-            "userId": item.user_id,
-            "type": "AutoGen Studio",
-            "source": item.message_id,
-            "cost": cost,
-            "extra": profile.get("usage", []),
-            "createdAt": int(time.time() * 1000)
-        })
-
-        # 更新用户积分
-        db["users"].update_one(
-            {"_id": ObjectId(item.user_id)},
-            {"$set": {
-                "extra_credits": extra_credits,
-                "subscription_credits": subscription_credits
-            }}
-        )
-
-        return {"extra_credits": extra_credits, "subscription_credits": subscription_credits}
-
-    except (OpenAIError, Exception) as ex_error:
+    except Exception as ex_error:
+        print(f"Error in update_user: {str(ex_error)}")
         return {
             "status": False,
-            "message": str(ex_error),
+            "message": str(ex_error)
         }
 
 
