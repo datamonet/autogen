@@ -21,7 +21,7 @@ function classNames(...classes: string[]) {
 const Header = ({ meta, link }: any) => {
   const { user, logout } = React.useContext(appContext);
   const userName = user ? user.name : "Unknown";
-  const userAvatarUrl = user ? user.avatar : ""; // takin command:修改用户展示
+  const userAvatarUrl = user ? user.image : ""; // takin command:修改用户展示
   const user_id = user ? user.name : "unknown";
 
   const links: any[] = [
@@ -132,12 +132,15 @@ const Header = ({ meta, link }: any) => {
                           className="text-sm text-primary"
                           title={`Subscription credits: ${(
                             Number(user?.subscription_credits) || 0
+                          ).toFixed(2)} + Purchased credits: ${(
+                            Number(user?.subscription_purchased_credits) || 0
                           ).toFixed(2)} + Extra credits: ${(
                             Number(user?.extra_credits) || 0
                           ).toFixed(2)}`}
                         >
                           {(
                             (Number(user?.subscription_credits) || 0) +
+                            (Number(user?.subscription_purchased_credits) || 0) +
                             (Number(user?.extra_credits) || 0)
                           ).toFixed(2)}
                         </span>

@@ -12,11 +12,12 @@ export interface IUser {
   id: string;
   name: string;
   email?: string;
-  avatar?: string;
+  image?: string;
   role: number;
   level?: number;
   extra_credits?: number;
   subscription_credits?: number;
+  subscription_purchased_credits?: number;
 }
 
 export interface AppContextType {
@@ -28,8 +29,9 @@ export interface AppContextType {
 }
 
 // TODO:修改callback
-const signUrl =
-  "https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fautogen.takin.ai";
+const signUrl = "https://test.takin.ai/signin";
+// const signUrl =  "https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fautogen.takin.ai";
+
 
 export const appContext = React.createContext<AppContextType>(
   {} as AppContextType
@@ -59,6 +61,7 @@ const Provider = ({ children }: any) => {
         return;
       }
       const userInfo = getLocalStorage("user_info");
+      console.log('获取的用户信息',data.data);
       if (userInfo !== null) {
         setUser(data.data);
         setInit(true);
