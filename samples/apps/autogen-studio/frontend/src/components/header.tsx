@@ -131,17 +131,17 @@ const Header = ({ meta, link }: any) => {
                         <span
                           className="text-sm text-primary"
                           title={`Subscription credits: ${(
-                            Number(user?.subscription_credits) || 0
+                            Number(user?.subscriptionCredits) || 0
                           ).toFixed(2)} + Purchased credits: ${(
-                            Number(user?.subscription_purchased_credits) || 0
+                            Number(user?.subscriptionPurchasedCredits) || 0
                           ).toFixed(2)} + Extra credits: ${(
-                            Number(user?.extra_credits) || 0
+                            Number(user?.extraCredits) || 0
                           ).toFixed(2)}`}
                         >
                           {(
-                            (Number(user?.subscription_credits) || 0) +
-                            (Number(user?.subscription_purchased_credits) || 0) +
-                            (Number(user?.extra_credits) || 0)
+                            (Number(user?.subscriptionCredits) || 0) +
+                            (Number(user?.subscriptionPurchasedCredits) || 0) +
+                            (Number(user?.extraCredits) || 0)
                           ).toFixed(2)}
                         </span>
                       </div>

@@ -7,7 +7,7 @@ import jwt
 import queue
 import threading
 import traceback
-import uuid
+import httpx
 from contextlib import asynccontextmanager
 from typing import Any, Union
 
@@ -20,7 +20,6 @@ from openai import OpenAIError
 from ..chatmanager import AutoGenChatManager
 from ..database import workflow_from_id
 from ..database.dbmanager import DBManager
-from ..database.postgres_client import get_user_by_email
 from ..datamodel import Agent, Message, Model, Response, Session, Skill, Workflow
 from ..profiler import Profiler
 from ..utils import check_and_cast_datetime_fields, init_app_folders, md5_hash, test_model
@@ -30,7 +29,7 @@ from ..websocket_connection_manager import WebSocketConnectionManager
 import httpx
 
 # cookie name for authjs v5
-cookie_name = "__Secure-authjs.session-token"
+cookie_name = "authjs.session-token"
 # cookie_name = "__Secure-next-auth.session-token"
 
 profiler = Profiler()
@@ -172,20 +171,20 @@ async def get_user(request: Request):
     """get user info from mongodb,关于登录，测试环境直接制定用户email"""
     try:
         token = request.cookies.get(cookie_name)
-
-        payload = jwt.decode(token, options={"verify_signature": False})
-        email = payload.get("email")
-        # email = 'faye_1225@163.com'
-        user = get_user_by_email(email)
-        if user:
-            return {
-                "status": True,
-                "data": user
-            }
-        return {
-            "status": False,
-            "message": "User not found"
-        }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{os.getenv('TAKIN_API_URL', '')}/api/external/user",
+                headers={"Authorization": f"Bearer {token}"}
+            )
+     
+            data = response.json()
+            if response.status_code == 200:
+                return {
+                    "status": True,
+                    "data": data.get('data')
+                }
+            return {"status": False, "message": "Failed to fetch user data"}
 
     except Exception as ex_error:
         print(f"Error in get_user: {str(ex_error)}")
@@ -227,28 +226,38 @@ def convert_to_serializable(obj):
 
 
 @api.post("/update")
-async def update_user(item: UpdatePayload):
+async def update_user(item: UpdatePayload, request: Request):
     """Update user info through Takin Pricing API"""
     try:
-        # 获取消息和用户配置文件
-        agent_message = dbmanager.get(Message, filters={"id": item.message_id}).data[0]
-        profile = profiler.profile(agent_message)
-        
-        # 转换profile为可序列化格式
-        serializable_profile = convert_to_serializable(profile)
+        # Get message from database
+        message = dbmanager.get_by_id(item.message_id, Message)
+        if not message:
+            return {"status": False, "message": "Message not found"}
+
+        # Get profile data
+        profile_data = await profile_agent_task_run(item.message_id)
+        serializable_profile = convert_to_serializable(profile_data)
 
         # 发送请求到计费服务
         async with httpx.AsyncClient() as client:
-            pricing_url = os.getenv("TAKIN_PRICING_URL")
+            pricing_url = f"{os.getenv('TAKIN_API_URL', '')}/api/external/autogen/pricing"
             request_data = {
                 "user_id": item.user_id,
                 "agent_profile": serializable_profile
             }
             
+            # Get token from request cookies
+            token = request.cookies.get(cookie_name)
+            if not token:
+                return {"status": False, "message": "No token found"}
+            
             response = await client.post(
                 pricing_url,
                 json=request_data,
-                headers={"Content-Type": "application/json"}
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {token}"
+                }
             )
             
             if response.status_code != 200:

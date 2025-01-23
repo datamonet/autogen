@@ -8,6 +8,11 @@ import {
   IWorkflow,
 } from "./types";
 
+export const getTakinServerUrl = () => {
+  return process.env.GATSBY_TAKIN_API_URL;
+};
+
+
 export const getServerUrl = () => {
   return process.env.GATSBY_API_URL || "/api";
 };

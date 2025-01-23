@@ -135,6 +135,7 @@ const ChatBox = ({
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         user_id: user?.id,
         message_id: message_id,
@@ -816,6 +817,7 @@ const ChatBox = ({
                   ) {
                     if (awaitingUserInput) {
                       sendUserResponse(textAreaInputRef.current.value); // Use the new function for user input
+                      textAreaInputRef.current.value = "";
                     } else {
                       runWorkflow(textAreaInputRef.current.value);
                     }
