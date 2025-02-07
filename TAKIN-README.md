@@ -1,0 +1,80 @@
+# AutoGen Studio Setup Guide
+
+## Local Environment Setup
+
+### Prerequisites
+- Python 3.10+
+- Node.js 14.15.0+
+- PostgreSQL
+
+### Installation Steps
+
+1. Clone the repository:
+```bash
+git clone https://github.com/datamonet/autogen.git
+cd autogen/samples/apps/autogen-studio
+```
+
+2. Configure Environment Variables:
+The `.autogenstudio-workspace` directory is used to store AutoGen-related data and configuration files. You'll need to set up the following environment variables:
+
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `TAKIN_API_URL`: URL for Takin user data API (default: http://localhost:3000)
+- `AUTOGENSTUDIO_DATABASE_URI`: PostgreSQL database connection URI
+
+Create your environment file by copying the example:
+```bash
+cp .autogenstudio-workspace/.env.example .autogenstudio-workspace/.env
+```
+
+Then edit `.autogenstudio-workspace/.env` with your specific configuration values.
+
+3. Install Python Dependencies:
+```bash
+pip install -e .
+```
+
+4. Set Up the Frontend:
+Navigate to the frontend directory and install the required dependencies:
+```bash
+# Install global dependencies
+npm install -g gatsby-cli
+npm install --global yarn
+
+# Install and build frontend
+cd frontend
+yarn install
+yarn build
+```
+
+5. Start the Application:
+```bash
+cd ..
+autogenstudio ui
+```
+
+The application will be available at http://localhost:3002 by default.
+
+## Development Notes
+
+### Frontend Development
+- The Takin main site URL is currently hardcoded in `samples/apps/autogen-studio/frontend/src/components/utils.ts` (line 11)
+- After making any changes to the frontend code, you must rebuild using `yarn build` for the changes to take effect
+- The built frontend files are automatically copied to `../autogenstudio/web/ui/` during the build process
+
+### File Structure
+- `.autogenstudio-workspace/`: Contains application data and configuration
+  - `.env`: Main configuration file (not version controlled)
+  - `.env.example`: Template for configuration (version controlled)
+- `frontend/`: Contains all frontend-related code
+- `autogenstudio/`: Contains the backend Python code
+
+## Troubleshooting
+
+If you encounter any issues:
+1. Ensure all environment variables are properly set
+2. Check that PostgreSQL is running and accessible
+3. Verify that the Takin API server is running if you're using user authentication
+4. Make sure you've rebuilt the frontend after making any changes
+
+For more detailed information, please refer to the [official documentation](https://microsoft.github.io/autogen/).
