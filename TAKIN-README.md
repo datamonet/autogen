@@ -15,12 +15,14 @@ git clone https://github.com/datamonet/autogen.git
 cd autogen/samples/apps/autogen-studio
 ```
 
-2. Configure Environment Variables:
+2. Create a PostgreSQL database: `autogen`
+
+3. Configure Environment Variables:
 The `.autogenstudio-workspace` directory is used to store AutoGen-related data and configuration files. You'll need to set up the following environment variables:
 
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `TAKIN_API_URL`: URL for Takin user data API (default: http://localhost:3000)
-- `AUTOGENSTUDIO_DATABASE_URI`: PostgreSQL database connection URI
+- `AUTOGENSTUDIO_DATABASE_URI`: use `postgresql://postgres:@localhost:5432/autogen` for local testing
 
 Create your environment file by copying the example:
 ```bash
@@ -29,12 +31,12 @@ cp .autogenstudio-workspace/.env.example .autogenstudio-workspace/.env
 
 Then edit `.autogenstudio-workspace/.env` with your specific configuration values.
 
-3. Install Python Dependencies:
+4. Install Python Dependencies:
 ```bash
 pip install -e .
 ```
 
-4. Set Up the Frontend:
+5. Set Up the Frontend:
 Navigate to the frontend directory and install the required dependencies:
 ```bash
 # Install global dependencies
@@ -47,7 +49,7 @@ yarn install
 yarn build
 ```
 
-5. Start the Application:
+6. Start the Application:
 ```bash
 cd ..
 autogenstudio ui
@@ -68,6 +70,10 @@ The application will be available at http://localhost:3002 by default.
   - `.env.example`: Template for configuration (version controlled)
 - `frontend/`: Contains all frontend-related code
 - `autogenstudio/`: Contains the backend Python code
+
+### E2B
+
+E2B is implemented in `autogenstudio/utils/e2b_commandline_code_executor.py` with accounts hardcoded for now.
 
 ## Troubleshooting
 

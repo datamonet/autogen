@@ -9,12 +9,15 @@ import {
 } from "./types";
 
 export const getTakinServerUrl = () => {
-  // TODO:使用环境变量导入
-  const signUrl = "http://localhost:3000";
-  // const signUrl = "https://test.takin.ai/signin";
-  // const signUrl =  "https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fautogen.takin.ai";
+  const defaultUrl = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:3000'
+    : process.env.GATSBY_TAKIN_API_URL;
 
-  return process.env.GATSBY_TAKIN_API_URL || signUrl;
+  if (!defaultUrl) {
+    console.warn('GATSBY_TAKIN_API_URL is not set in production environment');
+  }
+
+  return defaultUrl || 'http://localhost:3000';
 };
 
 export const getServerUrl = () => {
