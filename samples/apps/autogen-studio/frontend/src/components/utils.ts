@@ -9,15 +9,7 @@ import {
 } from "./types";
 
 export const getTakinServerUrl = () => {
-  const defaultUrl = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3000'
-    : process.env.GATSBY_TAKIN_API_URL;
-
-  if (!defaultUrl) {
-    console.warn('GATSBY_TAKIN_API_URL is not set in production environment');
-  }
-
-  return defaultUrl || 'http://localhost:3000';
+  return process.env.GATSBY_TAKIN_API_URL || 'http://localhost:3000';
 };
 
 export const getServerUrl = () => {

@@ -17,7 +17,7 @@ def ui(
     workers: int = 1,
     reload: Annotated[bool, typer.Option("--reload")] = False,
     docs: bool = True,
-    appdir: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".autogenstudio-workspace"),
+    appdir: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".autogenstudio-workspace"),  #  Takin changes
     database_uri: Optional[str] = None,
 ):
     """
