@@ -26,3 +26,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Ignore everything in .autogenstudio-workspace
+.autogenstudio-workspace/*
+# But not .env.example
+!.autogenstudio-workspace/.env.example

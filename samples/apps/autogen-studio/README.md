@@ -68,14 +68,13 @@ For Windows users, to build the frontend, you may need alternative commands to b
 ```
 
 ### Running the Application
+If you prefer to install from source, ensure you have Python 3.10+ and Node.js (version above 14.15.0) installed. Here's how you get started:
 
-Once installed, run the web UI by entering the following in your terminal:
+    - Clone the AutoGen Studio repository and install its Python dependencies:
 
-```bash
-autogenstudio ui --port 8081
-```
-
-This will start the application on the specified port. Open your web browser and go to `http://localhost:8081/` to begin using AutoGen Studio.
+      ```bash
+      pip install -e .
+      ```
 
 AutoGen Studio also takes several parameters to customize the application:
 

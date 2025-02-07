@@ -13,12 +13,16 @@ import { Fragment } from "react";
 import { appContext } from "../hooks/provider";
 import { Link } from "gatsby";
 import React from "react";
+import {
+  getTakinServerUrl
+} from "../components/utils";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 const Header = ({ meta, link }: any) => {
+  const TakinServerUrl = getTakinServerUrl();
   const { user, logout } = React.useContext(appContext);
   const userName = user ? user.name : "Unknown";
   const userAvatarUrl = user ? user.image : ""; // takin command:修改用户展示
@@ -73,7 +77,7 @@ const Header = ({ meta, link }: any) => {
                 <div className="flex flex-shrink-0 justify-center items-center">
                   <div
                     className="inline-block text-slate-900 bg-primary mr-1 pt-2 cursor-pointer"
-                    onClick={() => navigate("https://app.takin.ai/")}
+                    onClick={() => navigate(TakinServerUrl)}
                   >
                     <Logo className="w-[100px]" />
                   </div>
@@ -132,17 +136,17 @@ const Header = ({ meta, link }: any) => {
                           className="text-sm text-primary"
                           title={`Subscription credits: ${(
                             Number(user?.subscriptionCredits) || 0
-                          ).toFixed(2)} + Purchased credits: ${(
+                          ).toFixed(0)} + Purchased credits: ${(
                             Number(user?.subscriptionPurchasedCredits) || 0
-                          ).toFixed(2)} + Extra credits: ${(
+                          ).toFixed(0)} + Extra credits: ${(
                             Number(user?.extraCredits) || 0
-                          ).toFixed(2)}`}
+                          ).toFixed(0)}`}
                         >
                           {(
                             (Number(user?.subscriptionCredits) || 0) +
                             (Number(user?.subscriptionPurchasedCredits) || 0) +
                             (Number(user?.extraCredits) || 0)
-                          ).toFixed(2)}
+                          ).toFixed(0)}
                         </span>
                       </div>
 
@@ -178,7 +182,7 @@ const Header = ({ meta, link }: any) => {
                             <Menu.Item>
                               {({ active }) => (
                                 <a
-                                  href={`https://takin.ai/user/${user.id}`}
+                                  href={`${TakinServerUrl}/user/${user.id}`}
                                   className={classNames(
                                     active ? "bg-secondary" : "",
                                     "block px-4 py-2 text-sm text-primary"

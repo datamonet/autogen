@@ -13,11 +13,11 @@ app = typer.Typer()
 @app.command()
 def ui(
     host: str = "127.0.0.1",
-    port: int = 8081,
+    port: int = 3002,
     workers: int = 1,
     reload: Annotated[bool, typer.Option("--reload")] = False,
     docs: bool = True,
-    appdir: str = None,
+    appdir: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".autogenstudio-workspace"),
     database_uri: Optional[str] = None,
 ):
     """
@@ -25,7 +25,7 @@ def ui(
 
     Args:
         host (str, optional): Host to run the UI on. Defaults to 127.0.0.1 (localhost).
-        port (int, optional): Port to run the UI on. Defaults to 8081.
+        port (int, optional): Port to run the UI on. Defaults to 3002.
         workers (int, optional): Number of workers to run the UI with. Defaults to 1.
         reload (bool, optional): Whether to reload the UI on code changes. Defaults to False.
         docs (bool, optional): Whether to generate API docs. Defaults to False.

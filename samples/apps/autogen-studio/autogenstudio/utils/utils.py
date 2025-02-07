@@ -234,13 +234,17 @@ def get_app_root() -> str:
 
     :return: The root directory of the application.
     """
-    # TODO: takin command：先后顺序的逻辑修改，如果有AUTOGENSTUDIO_APPDIR 还需要创建default_app_root？
-    app_name = f".{APP_NAME}"
-    default_app_root = os.path.join(os.path.expanduser("~"), app_name)
-    if not os.path.exists(default_app_root):
-        os.makedirs(default_app_root, exist_ok=True)
-    app_root = os.environ.get("AUTOGENSTUDIO_APPDIR") or default_app_root
-    return app_root
+    # 首先检查是否通过环境变量指定了应用目录
+    app_root = os.environ.get("AUTOGENSTUDIO_APPDIR")
+    if app_root:
+        # 如果指定了目录，确保它存在
+        os.makedirs(app_root, exist_ok=True)
+        return app_root
+    
+    # 如果没有指定，使用默认目录（与cli.py保持一致）
+    default_app_root = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".autogenstudio-workspace")
+    os.makedirs(default_app_root, exist_ok=True)
+    return default_app_root
 
 
 def get_db_uri(app_root: str) -> str:

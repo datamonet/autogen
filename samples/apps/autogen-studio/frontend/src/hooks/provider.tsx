@@ -5,6 +5,7 @@ import {
   getLocalStorage,
   setLocalStorage,
   getServerUrl,
+  getTakinServerUrl
 } from "../components/utils";
 import { BounceLoader } from "../components/atoms";
 
@@ -15,9 +16,9 @@ export interface IUser {
   image?: string;
   role: number;
   level?: number;
-  extra_credits?: number;
-  subscription_credits?: number;
-  subscription_purchased_credits?: number;
+  extraCredits?: number;
+  subscriptionCredits?: number;
+  subscriptionPurchasedCredits?: number;
 }
 
 export interface AppContextType {
@@ -28,16 +29,13 @@ export interface AppContextType {
   setDarkMode: any;
 }
 
-// TODO:修改callback
-const signUrl = "https://test.takin.ai/signin";
-// const signUrl =  "https://takin.ai/auth/signin?callbackUrl=https%3A%2F%2Fautogen.takin.ai";
-
 
 export const appContext = React.createContext<AppContextType>(
   {} as AppContextType
 );
 const Provider = ({ children }: any) => {
   const serverUrl = getServerUrl();
+  const TakinServerUrl = getTakinServerUrl();
   const storedValue = getLocalStorage("darkmode", false);
   const [darkMode, setDarkMode] = useState(
     storedValue === null ? "light" : storedValue === "dark" ? "dark" : "light"
@@ -57,7 +55,7 @@ const Provider = ({ children }: any) => {
       if (data && !data["status"]) {
         setUser(null);
         setLocalStorage("user_info", null);
-        navigate(signUrl);
+        navigate(`${TakinServerUrl}/signin`);
         return;
       }
       const userInfo = getLocalStorage("user_info");
@@ -72,7 +70,7 @@ const Provider = ({ children }: any) => {
       setInit(true);
     };
     const onError = (err: any) => {
-      navigate(signUrl);
+      navigate(`${TakinServerUrl}/signin`);
     };
     fetchJSON(`${serverUrl}/login`, payLoad, onSuccess, onError);
   };
@@ -90,10 +88,10 @@ const Provider = ({ children }: any) => {
       if (data && !data["status"]) return;
       setUser(null);
       setLocalStorage("user_info", null);
-      navigate(signUrl);
+      navigate(`${TakinServerUrl}/signin`);
     };
     const onError = (err: any) => {
-      navigate(signUrl);
+      navigate(`${TakinServerUrl}/signin`);
     };
     fetchJSON(`${serverUrl}/logout`, payLoad, onSuccess, onError);
   };
