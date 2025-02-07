@@ -43,14 +43,17 @@ Navigate to the frontend directory and install the required dependencies:
 npm install -g gatsby-cli
 npm install --global yarn
 ```
-Temp Solution: For local development, change `frontend/.env.production` to `GATSBY_TAKIN_API_URL=http://localhost:3000` and for production, change it back to `GATSBY_TAKIN_API_URL=https://takin.ai` before `yarn build`
 
 ```
 # Install and build frontend
 cd frontend
 yarn install
-yarn build
 ```
+
+Then build the frontend:
+
+- For production, do this: `yarn build`, which will use `frontend/.env.production` and set `GATSBY_TAKIN_API_URL=https://takin.ai`
+- For local development, do this: `yarn build-dev`, which will use `frontend/.env.development` and set `GATSBY_TAKIN_API_URL=http://localhost:3000`
 
 6. Start the Application:
 ```bash

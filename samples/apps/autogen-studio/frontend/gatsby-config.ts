@@ -1,7 +1,7 @@
 import type { GatsbyConfig } from "gatsby";
 import fs from "fs";
 
-const envFile = `.env.${process.env.NODE_ENV}`;
+const envFile = `.env.${process.env.GATSBY_ACTIVE_ENV || process.env.NODE_ENV}`;
 
 fs.access(envFile, fs.constants.F_OK, (err) => {
   if (err) {
