@@ -66,8 +66,8 @@ The application will be available at http://localhost:3002 by default.
 ## Development Notes
 
 ### Frontend Development
-- The Takin main site URL is currently hardcoded in `samples/apps/autogen-studio/frontend/src/components/utils.ts` (line 11)
-- After making any changes to the frontend code, you must rebuild using `yarn build` for the changes to take effect
+
+- After making any changes to the frontend code, you must rebuild using `yarn build` or `yarn build-dev` for the changes to take effect
 - The built frontend files are automatically copied to `../autogenstudio/web/ui/` during the build process
 
 ### File Structure
@@ -79,14 +79,4 @@ The application will be available at http://localhost:3002 by default.
 
 ### E2B
 
-E2B is implemented in `autogenstudio/utils/e2b_commandline_code_executor.py` with accounts hardcoded for now.
-
-## Troubleshooting
-
-If you encounter any issues:
-1. Ensure all environment variables are properly set
-2. Check that PostgreSQL is running and accessible
-3. Verify that the Takin API server is running if you're using user authentication
-4. Make sure you've rebuilt the frontend after making any changes
-
-For more detailed information, please refer to the [official documentation](https://microsoft.github.io/autogen/).
+TODO: E2B is implemented in `autogenstudio/utils/e2b_commandline_code_executor.py` with accounts hardcoded for now.
