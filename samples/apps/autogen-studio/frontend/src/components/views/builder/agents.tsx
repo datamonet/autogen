@@ -223,7 +223,7 @@ const AgentsView = ({}: any) => {
       children: (
         <ul className="flex flex-wrap gap-3">
           {agentRows(
-            agents!.filter((agent) => agent.user_id === "curator@takin.ai")
+            agents!.filter((agent) => agent.user_id === "admin@takin.ai")
           )}
         </ul>
       ),

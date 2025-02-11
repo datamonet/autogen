@@ -141,12 +141,12 @@ def run_migration(engine_uri: str):
         # raise RuntimeError(f"Error running migrations: {exc}")
 
 
-def init_db_samples(dbmanager: Any, user_id: str = "curator@takin.ai"):
+def init_db_samples(dbmanager: Any, user_id: str = "admin@takin.ai"):
     """Initialize database with sample data.
     
     Args:
         dbmanager: Database manager instance
-        user_id: User ID to associate with the sample data, defaults to curator@takin.ai
+        user_id: User ID to associate with the sample data, defaults to admin@takin.ai
         
     Returns:
         None
