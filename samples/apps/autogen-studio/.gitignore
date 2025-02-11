@@ -31,6 +31,3 @@ venv.bak/
 .autogenstudio-workspace/*
 # But not .env.example
 !.autogenstudio-workspace/.env.example
-
-frontend/.env.development
-frontend/.env.production
