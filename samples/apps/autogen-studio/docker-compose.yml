@@ -7,10 +7,10 @@ services:
       dockerfile: Dockerfile
     container_name: autogen
     ports:
-      - "8081:8081"
+      - "3002:3002"
     env_file:
       - .env
-    volumes:
-      - /mnt/autogen_volume:/home/user/app/files
+    # volumes: # 正式环境需要挂在一个存储卷
+    #   - /mnt/autogen_volume:/home/user/app/files
     command: >
-      sh -c "gunicorn -w $((2 * $(getconf _NPROCESSORS_ONLN) + 1)) --timeout 12600 -k uvicorn.workers.UvicornWorker autogenstudio.web.app:app --bind '0.0.0.0:8081'"
+      sh -c "gunicorn -w $((2 * $(getconf _NPROCESSORS_ONLN) + 1)) --timeout 12600 -k uvicorn.workers.UvicornWorker autogenstudio.web.app:app --bind '0.0.0.0:3002'"

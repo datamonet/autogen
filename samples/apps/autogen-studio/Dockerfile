@@ -2,7 +2,7 @@ FROM python:3.10
 
 # Install dependencies
 RUN pip install -U gunicorn autogenstudio autogen
-RUN pip install -U PyJWT pymongo psycopg2-binary anthropic e2b-code-interpreter
+RUN pip install -U PyJWT psycopg2-binary anthropic e2b-code-interpreter
 
 # Create the user
 RUN useradd -m -u 1000 user
@@ -25,4 +25,4 @@ WORKDIR $HOME/app
 COPY --chown=user:user . $HOME/app
 
 # Start the application with gunicorn
-CMD gunicorn -w $((2 * $(getconf _NPROCESSORS_ONLN) + 1)) --timeout 12600 -k uvicorn.workers.UvicornWorker autogenstudio.web.app:app --bind "0.0.0.0:8081"
+CMD gunicorn -w $((2 * $(getconf _NPROCESSORS_ONLN) + 1)) --timeout 12600 -k uvicorn.workers.UvicornWorker autogenstudio.web.app:app --bind "0.0.0.0:3002"
