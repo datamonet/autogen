@@ -23,6 +23,7 @@ The `.autogenstudio-workspace` directory is used to store AutoGen-related data a
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `TAKIN_API_URL`: URL for Takin user data API (default: http://localhost:3000)
 - `AUTOGENSTUDIO_DATABASE_URI`: use `postgresql://postgres:@localhost:5432/autogen` for local testing
+- `DEPLOY_ENV`: use `PRODUCTION` for production, `TESTING` for local testing (default: PRODUCTION)
 
 Create your environment file by copying the example:
 ```bash
