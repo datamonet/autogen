@@ -29,8 +29,8 @@ from ..websocket_connection_manager import WebSocketConnectionManager
 import httpx
 
 # cookie name for authjs v5
-cookie_name = "authjs.session-token"
-# cookie_name = "__Secure-next-auth.session-token"
+cookie_name = "__Secure-authjs.session-token" if os.getenv("DEPLOY_ENV") == "PRODUCTION" else "authjs.session-token"
+
 
 profiler = Profiler()
 managers = {"chat": None}  # manage calls to autogen

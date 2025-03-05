@@ -182,7 +182,7 @@ const Header = ({ meta, link }: any) => {
                             <Menu.Item>
                               {({ active }) => (
                                 <a
-                                  href={`${TakinServerUrl}/user/${user.id}`}
+                                  href={`${TakinServerUrl}/user`}
                                   className={classNames(
                                     active ? "bg-secondary" : "",
                                     "block px-4 py-2 text-sm text-primary"

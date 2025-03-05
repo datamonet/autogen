@@ -236,7 +236,7 @@ const WorkflowView = ({}: any) => {
           {" "}
           {workflowRows(
             workflows!.filter(
-              (workflow) => workflow.user_id === "curator@takin.ai"
+              (workflow) => workflow.user_id === "admin@takin.ai"
             )
           )}
         </ul>
